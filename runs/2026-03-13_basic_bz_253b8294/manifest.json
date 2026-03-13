@@ -1,0 +1,17 @@
+{
+  "run_id": "253b8294-4000-42ad-8a4c-769713da7a3a",
+  "name": "BASIC_BZ",
+  "description": "Preset: basic-bz",
+  "timestamp": "2026-03-13T04:09:26.609910+00:00",
+  "frozen_version": "3.0.0",
+  "code_digest": "sha256:80ddfacb90013c2a",
+  "claim_class": "G",
+  "regime": "DC",
+  "files": [
+    "spec.json",
+    "drive.json",
+    "observables.json",
+    "claim.json",
+    "environment.json"
+  ]
+}

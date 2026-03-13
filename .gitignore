@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Artifacts — keep golden examples, ignore dev runs
+runs/dev_*/
+runs/tmp_*/
+!runs/golden/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# SymPy cache (can be large)
+*.sympy_cache/

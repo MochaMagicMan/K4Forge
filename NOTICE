@@ -1,0 +1,17 @@
+K4 Field Sculpting Engine
+Copyright 2026 Charles Alexander Ward
+
+This product includes software developed by Charles Alexander Ward.
+
+The K4 tetrahedral electromagnetic framework, frozen algebraic core,
+control doctrine, and exploration engine architecture are original
+work by the copyright holder.
+
+The frozen core (k4_frozen/) contains self-verifying mathematical
+identities proven to exact Integer(0) via SymPy. These identities
+are properties of the K4 complete graph and its tetrahedral
+electromagnetic embedding.
+
+Third-party dependencies (numpy, scipy, sympy, matplotlib) are
+licensed under their respective terms and are not included in this
+distribution.

@@ -1,0 +1,56 @@
+{
+  "control_spec": {
+    "B_target": [
+      0.0,
+      0.0,
+      1e-05
+    ],
+    "E_target": [
+      100.0,
+      0.0,
+      0.0
+    ],
+    "null_point": null,
+    "probe_targets": [],
+    "minimize_current": true,
+    "gradient_preference": null,
+    "I_max_per_edge": 10.0,
+    "V_max_per_vertex": 100.0,
+    "frequency": 0.0,
+    "config_id": "D",
+    "trajectory": null
+  },
+  "geometry_spec": {
+    "vertices": [
+      [
+        0.035355339059327376,
+        0.035355339059327376,
+        0.035355339059327376
+      ],
+      [
+        0.035355339059327376,
+        -0.035355339059327376,
+        -0.035355339059327376
+      ],
+      [
+        -0.035355339059327376,
+        0.035355339059327376,
+        -0.035355339059327376
+      ],
+      [
+        -0.035355339059327376,
+        -0.035355339059327376,
+        0.035355339059327376
+      ]
+    ],
+    "edge_length": 0.1,
+    "symmetry_class": "Td_regular",
+    "wire_radius": 0.0005,
+    "config_id": "D",
+    "calibrated_F0": null,
+    "symmetry_deviations": {
+      "max_edge_deviation": 0.0
+    },
+    "broken_assumptions": []
+  }
+}

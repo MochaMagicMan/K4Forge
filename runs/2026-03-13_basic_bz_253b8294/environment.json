@@ -1,0 +1,7 @@
+{
+  "python_version": "3.12.3 (main, Jan 22 2026, 20:57:42) [GCC 13.3.0]",
+  "platform": "Linux-4.4.0-x86_64-with-glibc2.39",
+  "numpy_version": "2.4.2",
+  "scipy_version": "1.17.0",
+  "sympy_version": "1.14.0"
+}

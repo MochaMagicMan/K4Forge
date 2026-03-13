@@ -1,0 +1,61 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "k4-engine"
+version = "0.1.0"
+description = "K4 Tetrahedral Electromagnetic Field Control — Exploration Engine"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.24",
+    "scipy>=1.10",
+    "sympy>=1.12",
+    "matplotlib>=3.7",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0", "ruff>=0.1"]
+
+[project.scripts]
+k4 = "k4_cli.run:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "gates: SymPy gate verification (may be slow)",
+    "regression: regression anchor tests",
+    "vertical: end-to-end vertical slice",
+]
+
+[tool.ruff]
+line-length = 100
+[tool.hatch.build.targets.wheel]
+packages = [
+  "k4_artifacts",
+  "k4_cli",
+  "k4_explorer",
+  "k4_frozen",
+  "k4_viz",
+]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "/k4_artifacts",
+  "/k4_cli",
+  "/k4_explorer",
+  "/k4_frozen",
+  "/k4_viz",
+  "/tests",
+  "/docs",
+  "/archive",
+  "/README.md",
+  "/LICENSE",
+  "/LICENSE-HARDWARE",
+  "/PATENTS.md",
+  "/SAFETY.md",
+  "/NOTICE",
+  "/Makefile",
+  "/pyproject.toml",
+  "/.gitignore",
+]

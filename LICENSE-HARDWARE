@@ -1,0 +1,29 @@
+CERN Open Hardware Licence Version 2 — Weakly Reciprocal (CERN-OHL-W v2)
+
+Hardware design files, schematics, CAD, winding documents, fabrication
+notes, and similar design-source materials in this repository are
+licensed under the CERN Open Hardware Licence Version 2 — Weakly
+Reciprocal (CERN-OHL-W v2).
+
+The definitive licence text is maintained by CERN at:
+    https://cern-ohl.web.cern.ch/
+
+Direct links to the official CERN-OHL-W v2 text:
+    Text:  https://ohwr.org/cern_ohl_w_v2.txt
+    PDF:   https://ohwr.org/cern_ohl_w_v2.pdf
+
+SPDX identifier: CERN-OHL-W-2.0
+
+The CERN-OHL-W is copyright CERN 2020.
+Anyone is welcome to use it, in unmodified form only.
+Use of this Licence does not imply any endorsement by CERN of any
+Licensor or their designs nor does it imply any involvement by CERN
+in their development.
+
+Copyright 2026 Charles Alexander Ward
+Source location: https://github.com/k4forge/k4-engine
+
+This Source is distributed WITHOUT ANY EXPRESS OR IMPLIED WARRANTY,
+INCLUDING OF MERCHANTABILITY, SATISFACTORY QUALITY AND FITNESS FOR
+A PARTICULAR PURPOSE. Please see the CERN-OHL-W v2 for applicable
+conditions.

@@ -1,0 +1,7 @@
+{
+  "python_version": "3.13.3 (tags/v3.13.3:6280bb5, Apr  8 2025, 14:47:33) [MSC v.1943 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "numpy_version": "2.2.6",
+  "scipy_version": "1.15.3",
+  "sympy_version": "1.14.0"
+}
