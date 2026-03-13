@@ -1,3 +1,7 @@
+www.k4forge.org {
+    redir https://k4forge.org{uri} permanent
+}
+
 k4forge.org {
     root * /var/www/k4forge
     file_server
