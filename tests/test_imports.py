@@ -78,7 +78,7 @@ def test_contracts_is_pure_schema():
         pytest.skip("contracts.py not yet created")
 
     imports = _get_imports(contracts_file)
-    allowed_prefixes = {"__future__", "numpy", "np", "dataclasses", "enum", "typing"}
+    allowed_prefixes = {"__future__", "numpy", "np", "dataclasses", "enum", "typing", "hashlib"}
 
     violations = []
     for imp in imports:
@@ -151,6 +151,24 @@ def test_archive_not_importable():
 
 
 # ── Rule 6: k4_explorer.solver must not directly import field_engine ──
+
+# ── Rule 7: k4_cli must not import k4_frozen directly ──
+
+def test_cli_does_not_import_frozen():
+    """k4_cli.* must use k4_explorer.runtime, never import k4_frozen directly."""
+    cli_dir = ROOT / "k4_cli"
+    violations = []
+    for py_file in _all_py_files(cli_dir):
+        imports = _get_imports(py_file)
+        for imp in imports:
+            if imp == "k4_frozen" or imp.startswith("k4_frozen."):
+                violations.append(f"{py_file.relative_to(ROOT)}: imports {imp}")
+
+    assert not violations, (
+        "k4_cli must not import k4_frozen directly — use k4_explorer.runtime:\n"
+        + "\n".join(violations)
+    )
+
 
 def test_solver_uses_context_not_field_engine():
     """Solver sees the field engine only through FieldContext."""

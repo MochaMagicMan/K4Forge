@@ -33,8 +33,8 @@ def _viewport_positions(ctx: FieldContext) -> dict:
     # Face centers
     face_center_0 = (V[1] + V[2] + V[3]) / 3  # opposite V0
 
-    # Vertex axis direction (V0 → centroid extended)
-    v0_dir = c - V[0]
+    # Vertex axis direction (centroid → V0, outward along C3 axis)
+    v0_dir = V[0] - c
     v0_hat = v0_dir / np.linalg.norm(v0_dir) if np.linalg.norm(v0_dir) > 0 else np.array([0, 0, 1])
 
     # Edge midpoints
@@ -47,9 +47,9 @@ def _viewport_positions(ctx: FieldContext) -> dict:
         "VP-04": c + 0.3 * L * v0_hat,                # Vertex axis 0.3L
         "VP-05": c + 0.6 * L * v0_hat,                # Vertex axis 0.6L
         "VP-06": edge_mid_01,                          # Edge midpoint E01
-        "VP-07": c + 1.0 * L * np.array([1, 0, 0]),   # Exterior 1L
-        "VP-08": c + 3.0 * L * np.array([1, 0, 0]),   # Exterior 3L
-        "VP-09": c + 0.1 * L * np.array([1, 0, 0]),   # Null ring 0.1L
+        "VP-07": c + 1.0 * L * v0_hat,                # Exterior 1L along C3
+        "VP-08": c + 3.0 * L * v0_hat,                # Exterior 3L along C3
+        "VP-09": c + 0.1 * L * np.array([1, 0, 0]),   # Null ring 0.1L (off C3 axis)
     }
 
 

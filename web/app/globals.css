@@ -1,0 +1,180 @@
+:root {
+  /* K4 color system */
+  --k4-bg: #0a0a0f;
+  --k4-surface: #12121a;
+  --k4-surface-2: #1a1a25;
+  --k4-border: #2a2a3a;
+  --k4-text: #e8e8f0;
+  --k4-text-muted: #8888a0;
+  --k4-accent: #4488ff;
+  --k4-accent-dim: #2255aa;
+  --k4-gold: #d4a030;
+  --k4-green: #30c060;
+  --k4-red: #e04040;
+  --k4-claim-G: #30c060;
+  --k4-claim-M: #4488ff;
+  --k4-claim-H: #d4a030;
+
+  --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  background: var(--k4-bg);
+  color: var(--k4-text);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--k4-accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+code, pre {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+pre {
+  background: var(--k4-surface);
+  border: 1px solid var(--k4-border);
+  border-radius: 6px;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+/* Utility classes */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.15em 0.5em;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+}
+
+.badge-G {
+  background: rgba(48, 192, 96, 0.15);
+  color: var(--k4-claim-G);
+  border: 1px solid rgba(48, 192, 96, 0.3);
+}
+
+.badge-M {
+  background: rgba(68, 136, 255, 0.15);
+  color: var(--k4-claim-M);
+  border: 1px solid rgba(68, 136, 255, 0.3);
+}
+
+.badge-H {
+  background: rgba(212, 160, 48, 0.15);
+  color: var(--k4-claim-H);
+  border: 1px solid rgba(212, 160, 48, 0.3);
+}
+
+/* Page sections */
+.page-header {
+  padding: 3rem 0 2rem;
+  border-bottom: 1px solid var(--k4-border);
+  margin-bottom: 2rem;
+}
+
+.page-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.page-header p {
+  color: var(--k4-text-muted);
+  font-size: 1.1rem;
+}
+
+.section {
+  padding: 2rem 0;
+}
+
+/* Cards */
+.card {
+  background: var(--k4-surface);
+  border: 1px solid var(--k4-border);
+  border-radius: 8px;
+  padding: 1.25rem;
+}
+
+.card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.card p {
+  color: var(--k4-text-muted);
+  font-size: 0.9rem;
+}
+
+/* Key-value grid (used in demo tabs) */
+.kv-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.35rem 1rem;
+  font-size: 0.85rem;
+  font-family: var(--font-mono);
+}
+
+.kv-key {
+  color: var(--k4-text-muted);
+  white-space: nowrap;
+}
+
+.kv-val {
+  color: var(--k4-text);
+  word-break: break-all;
+}
+
+/* Metric cards (top strip) */
+.metric-label {
+  font-size: 0.7rem;
+  color: var(--k4-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.2rem;
+}
+
+.metric-value {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--k4-text);
+}
+
+.metric-sub {
+  font-size: 0.75rem;
+  color: var(--k4-text-muted);
+  font-family: var(--font-mono);
+  margin-top: 0.1rem;
+}
+
+/* Responsive: stack 4-col grid on narrow screens */
+@media (max-width: 768px) {
+  .page-header {
+    padding: 2rem 0 1.5rem;
+  }
+}

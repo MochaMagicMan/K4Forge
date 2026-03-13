@@ -1,0 +1,19 @@
+{
+  "claim_class": "G",
+  "assumptions": [
+    "regular_K4",
+    "Biot-Savart",
+    "quasi-static",
+    "Config_D"
+  ],
+  "regime": "DC",
+  "frozen_version": "3.0.0",
+  "code_digest": "sha256:80ddfacb90013c2a",
+  "numerical_tolerances": {
+    "F0G_residual": 0.0
+  },
+  "gate_status": {
+    "populated": true
+  },
+  "timestamp": "2026-03-13T05:57:47.389817+00:00"
+}

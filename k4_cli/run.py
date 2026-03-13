@@ -3,14 +3,15 @@ k4_cli.run — Main CLI Entry Point
 ====================================
 
 Usage:
-    k4 run <preset>          Run a preset and save artifact
+    k4 run <preset>          Run a preset and save artifact with figures
     k4 run --spec FILE       Run from a JSON spec file
     k4 verify                Run frozen core verification (182 gates)
     k4 inspect <dir>         Inspect a saved artifact
+    k4 figures <dir>         Regenerate figures from a saved artifact
 
 IMPORT RULES:
-    May import: k4_explorer, k4_artifacts
-    Must never import: k4_frozen directly
+    May import: k4_explorer, k4_artifacts, k4_viz
+    Must never import: k4_frozen directly — use k4_explorer.runtime facade
 """
 
 import argparse
@@ -19,9 +20,11 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
+import numpy as np
+
 
 def cmd_run(args):
-    """Run a preset or spec and produce a saved artifact."""
+    """Run a preset or spec and produce a saved artifact with figures."""
     from k4_explorer.presets import PRESET_REGISTRY
     from k4_explorer.context import build_context
     from k4_explorer.solver import solve_dc
@@ -29,15 +32,15 @@ def cmd_run(args):
     from k4_explorer.contracts import RunArtifact, ClaimRecord, FrequencyRegime
     from k4_artifacts.writer import write_artifact
     from k4_artifacts.digest import solver_digest
-    import k4_frozen
+    from k4_explorer.runtime import check_frozen, frozen_version
+    from k4_viz.figures import generate_run_figures
 
-    # ── Step 0: Verify frozen core ──
+    # -- Step 0: Verify frozen core --
     print("Verifying frozen core...", end=" ", flush=True)
-    k4_frozen.check_populated()
-    # Full gate check deferred to test suite; here we just check population
+    check_frozen()
     print("OK")
 
-    # ── Step 1: Load spec ──
+    # -- Step 1: Load spec --
     if args.preset:
         preset_name = args.preset.lower().replace("_", "-")
         if preset_name not in PRESET_REGISTRY:
@@ -51,35 +54,35 @@ def cmd_run(args):
         print("JSON spec loading not yet implemented. Use a preset.")
         return 1
 
-    # ── Step 2: Build field context ──
+    # -- Step 2: Build field context --
     print("Building field context...", end=" ", flush=True)
     ctx = build_context(geometry_spec)
-    print(f"OK (F0G_residual={ctx.F0G_residual:.2e}, κ={ctx.F0M_condition:.3f}, "
+    print(f"OK (F0G_residual={ctx.F0G_residual:.2e}, cond={ctx.F0M_condition:.3f}, "
           f"ceiling=[{ctx.claim_ceiling.value}])")
 
-    # ── Step 3: Solve ──
+    # -- Step 3: Solve --
     print("Solving...", end=" ", flush=True)
     drive = solve_dc(control_spec, ctx)
-    print(f"OK (I_max={drive.I_max*1e3:.3f} mA, P={drive.P_dissipated*1e6:.2f} µW)")
+    print(f"OK (I_max={drive.I_max*1e3:.3f} mA, P={drive.P_dissipated*1e6:.2f} uW)")
 
-    # ── Step 4: Evaluate viewports ──
+    # -- Step 4: Evaluate viewports --
     print("Evaluating viewports...", end=" ", flush=True)
     obs = evaluate_viewports(drive, ctx)
     print(f"OK ({len(obs)} viewports)")
 
-    # ── Step 5: Build provenance ──
+    # -- Step 5: Build provenance --
     claim = ClaimRecord(
         claim_class=ctx.claim_ceiling,
         assumptions=("regular_K4", "Biot-Savart", "quasi-static", "Config_D"),
         regime=FrequencyRegime.DC,
-        frozen_version=k4_frozen.__version__,
+        frozen_version=frozen_version(),
         code_digest=solver_digest(),
         numerical_tolerances={"F0G_residual": ctx.F0G_residual},
         gate_status={"populated": True},  # full gates run in test suite
         timestamp=datetime.now(timezone.utc).isoformat(),
     )
 
-    # ── Step 6: Build and save artifact ──
+    # -- Step 6: Build artifact --
     artifact = RunArtifact(
         run_id=str(uuid.uuid4()),
         name=run_name,
@@ -91,11 +94,30 @@ def cmd_run(args):
         claim_record=claim,
     )
 
+    # -- Step 7: Generate figures (before writing manifest) --
     output_dir = args.output or "runs"
+    # Create the artifact directory structure first
     run_dir = write_artifact(artifact, output_dir)
+
+    print("Generating figures...", end=" ", flush=True)
+    fig_dir = str(run_dir / "figures")
+    fig_paths = generate_run_figures(
+        V=ctx.V, L=ctx.L, I_edge=drive.I_edge,
+        observables=obs, field_eval=ctx.field_matrix_at,
+        output_dir=fig_dir,
+    )
+    print(f"OK ({len(fig_paths)} figures)")
+
+    # -- Step 8: Update manifest with figure list --
+    import json
+    manifest_path = run_dir / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8-sig"))
+    manifest["figures"] = sorted(fig_paths.keys())
+    manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+
     print(f"\nArtifact saved: {run_dir}")
 
-    # ── Summary ──
+    # -- Summary --
     vp01 = next((o for o in obs if o.viewport_id == "VP-01"), None)
     if vp01:
         print(f"\nVP-01 (centroid):")
@@ -113,13 +135,13 @@ def cmd_verify(args):
     """Run frozen core verification."""
     print("Running k4_frozen.verify_all...")
     try:
-        from k4_frozen.verify_all import run_verification
-        report = run_verification(verbose=True)
+        from k4_explorer.runtime import run_frozen_verification
+        report = run_frozen_verification(verbose=True)
         if report.get("all_pass"):
-            print("\n✅ ALL GATES PASS")
+            print("\nALL GATES PASS")
             return 0
         else:
-            print("\n❌ FAILURES DETECTED")
+            print("\nFAILURES DETECTED")
             return 1
     except ImportError:
         print("k4_frozen not populated. Copy v3 modules first.")
@@ -137,6 +159,59 @@ def cmd_inspect(args):
     except Exception as e:
         print(f"Error: {e}")
         return 1
+    return 0
+
+
+def cmd_figures(args):
+    """Regenerate figures from a saved artifact directory."""
+    from k4_artifacts.reader import load_json
+    from k4_explorer.context import build_context
+    from k4_explorer.geometry import adapt_regular, adapt_irregular
+    from k4_explorer.contracts import SymmetryClass
+    from k4_viz.figures import generate_run_figures
+
+    artifact_dir = Path(args.artifact_dir)
+
+    # Load artifact data
+    spec = load_json(str(artifact_dir), "spec.json")
+    drive = load_json(str(artifact_dir), "drive.json")
+    obs = load_json(str(artifact_dir), "observables.json")
+
+    # Rebuild field context from saved geometry
+    # (build_context is in k4_explorer, not k4_frozen — import rules respected)
+    geom = spec["geometry_spec"]
+    V = np.array(geom["vertices"])
+    L = geom["edge_length"]
+    sym = geom.get("symmetry_class", "Td_regular")
+    wire_r = geom.get("wire_radius", 0.0)
+
+    if sym in ("Td_regular", "Td_approximate"):
+        geometry_spec = adapt_regular(L=L, wire_radius=wire_r)
+    else:
+        geometry_spec = adapt_irregular(V, wire_radius=wire_r)
+
+    ctx = build_context(geometry_spec)
+    I_edge = np.array(drive["I_edge"])
+
+    # Generate figures
+    fig_dir = str(artifact_dir / "figures")
+    fig_paths = generate_run_figures(
+        V=ctx.V, L=ctx.L, I_edge=I_edge,
+        observables=obs, field_eval=ctx.field_matrix_at,
+        output_dir=fig_dir,
+    )
+
+    # Update manifest with figure list
+    import json
+    manifest_path = artifact_dir / "manifest.json"
+    if manifest_path.exists():
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8-sig"))
+        manifest["figures"] = sorted(fig_paths.keys())
+        manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+
+    print(f"Generated {len(fig_paths)} figures in {fig_dir}")
+    for name, path in sorted(fig_paths.items()):
+        print(f"  {name}: {path}")
     return 0
 
 
@@ -160,6 +235,10 @@ def main():
     p_inspect = sub.add_parser("inspect", help="Inspect a saved artifact")
     p_inspect.add_argument("artifact_dir", help="Path to artifact directory")
 
+    # k4 figures
+    p_figures = sub.add_parser("figures", help="Regenerate figures from artifact")
+    p_figures.add_argument("artifact_dir", help="Path to artifact directory")
+
     args = parser.parse_args()
 
     if args.command == "run":
@@ -168,6 +247,8 @@ def main():
         sys.exit(cmd_verify(args))
     elif args.command == "inspect":
         sys.exit(cmd_inspect(args))
+    elif args.command == "figures":
+        sys.exit(cmd_figures(args))
     else:
         parser.print_help()
         sys.exit(0)

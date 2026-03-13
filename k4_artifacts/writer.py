@@ -20,7 +20,7 @@ import json
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 import numpy as np
 
@@ -30,6 +30,8 @@ from k4_explorer.contracts import (
     FrequencyRegime, RegressionStatus, ConfigID,
 )
 from . import digest as dg
+
+ARTIFACT_SCHEMA_VERSION = "1.1.0"
 
 
 class _NumpyEncoder(json.JSONEncoder):
@@ -75,9 +77,19 @@ def _serialize(obj) -> dict:
 
 def write_artifact(artifact: RunArtifact,
                    output_dir: str,
-                   notes: str = "") -> Path:
+                   notes: str = "",
+                   figures: Optional[Dict[str, str]] = None) -> Path:
     """
     Write a RunArtifact to a directory.
+
+    Manifest is written LAST so it is always a complete snapshot
+    that includes any generated figure references.
+
+    Args:
+        artifact: the complete run artifact
+        output_dir: parent directory for the run folder
+        notes: optional free-form notes
+        figures: optional dict of {name: filepath} for generated figures
 
     Returns the path to the artifact directory.
     """
@@ -93,20 +105,6 @@ def write_artifact(artifact: RunArtifact,
     run_dir = Path(output_dir) / dir_name
     run_dir.mkdir(parents=True, exist_ok=True)
     (run_dir / "figures").mkdir(exist_ok=True)
-
-    # Manifest
-    manifest = {
-        "run_id": artifact.run_id,
-        "name": artifact.name,
-        "description": artifact.description,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "frozen_version": artifact.claim_record.frozen_version if artifact.claim_record else "unknown",
-        "code_digest": dg.solver_digest(),
-        "claim_class": artifact.claim_record.claim_class.value if artifact.claim_record else "M",
-        "regime": artifact.claim_record.regime.value if artifact.claim_record else "DC",
-        "files": ["spec.json", "drive.json", "observables.json", "claim.json", "environment.json"],
-    }
-    _write_json(run_dir / "manifest.json", manifest)
 
     # Spec (inputs)
     spec_data = {
@@ -133,10 +131,29 @@ def write_artifact(artifact: RunArtifact,
     all_notes = notes or artifact.notes or ""
     if artifact.ledger_entries:
         all_notes += "\n\n## Ledger\n" + "\n".join(f"- {e}" for e in artifact.ledger_entries)
-    (run_dir / "notes.md").write_text(all_notes)
+    (run_dir / "notes.md").write_text(all_notes, encoding="utf-8")
+
+    # Manifest — written LAST so it's always a complete snapshot
+    file_list = ["spec.json", "drive.json", "observables.json", "claim.json", "environment.json"]
+    manifest = {
+        "run_id": artifact.run_id,
+        "name": artifact.name,
+        "description": artifact.description,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "frozen_version": artifact.claim_record.frozen_version if artifact.claim_record else "unknown",
+        "code_digest": dg.solver_digest(),
+        "claim_class": artifact.claim_record.claim_class.value if artifact.claim_record else "M",
+        "regime": artifact.claim_record.regime.value if artifact.claim_record else "DC",
+        "frozen_digest": dg.frozen_digest(),
+        "artifact_schema_version": ARTIFACT_SCHEMA_VERSION,
+        "files": file_list,
+    }
+    if figures:
+        manifest["figures"] = sorted(figures.keys())
+    _write_json(run_dir / "manifest.json", manifest)
 
     return run_dir
 
 
 def _write_json(path: Path, data):
-    path.write_text(json.dumps(data, indent=2, cls=_NumpyEncoder))
+    path.write_text(json.dumps(data, indent=2, cls=_NumpyEncoder), encoding="utf-8")
