@@ -2,12 +2,12 @@
   "presets": [
     {
       "id": "basic-bz",
-      "name": "BASIC_BZ",
-      "description": "Uniform Bz at centroid, DC, regular K4",
+      "name": "Centered upward field",
+      "description": "10 µT upward magnetic field at the tetrahedron center",
       "claim_class": "G",
       "artifact_path": "basic-bz/artifact.json"
     }
   ],
-  "generated": "2026-03-12T00:00:00Z",
+  "generated": "2026-03-14T00:00:00Z",
   "engine_version": "3.0.0"
 }
