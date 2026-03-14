@@ -36,6 +36,7 @@ packages = [
   "k4_cli",
   "k4_explorer",
   "k4_frozen",
+  "k4_theory",
   "k4_viz",
 ]
 
@@ -45,6 +46,7 @@ include = [
   "/k4_cli",
   "/k4_explorer",
   "/k4_frozen",
+  "/k4_theory",
   "/k4_viz",
   "/tests",
   "/docs",

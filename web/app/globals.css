@@ -11,6 +11,7 @@
   --k4-gold: #d4a030;
   --k4-green: #30c060;
   --k4-red: #e04040;
+  --k4-claim-A: #c070ff;
   --k4-claim-G: #30c060;
   --k4-claim-M: #4488ff;
   --k4-claim-H: #d4a030;
@@ -70,6 +71,12 @@ pre {
   font-weight: 600;
   font-family: var(--font-mono);
   letter-spacing: 0.02em;
+}
+
+.badge-A {
+  background: rgba(192, 112, 255, 0.15);
+  color: var(--k4-claim-A);
+  border: 1px solid rgba(192, 112, 255, 0.3);
 }
 
 .badge-G {

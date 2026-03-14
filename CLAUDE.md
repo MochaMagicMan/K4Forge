@@ -24,13 +24,23 @@ This is the K4 Tetrahedral EM Field Control exploration engine.
 - Phase 3: website scaffold in web/ (Next.js static export → k4forge.org)
 - k4_frozen/ has 182 consistency checks (run with `python -m k4_frozen.verify_all`)
 
-## Import rules (enforced by tests/test_imports.py)
+## Import rules (enforced by tests/test_imports.py + test_theory_miner.py)
 - k4_frozen must never import from k4_explorer
 - k4_cli must never import k4_frozen directly — use k4_explorer.runtime facade
 - k4_viz must never import from k4_frozen (reads artifacts only)
 - k4_explorer.solver must not import k4_frozen.field_engine directly (use context.py)
 - k4_explorer.contracts imports only numpy/typing/dataclasses/enum — no logic
+- k4_theory must never import from k4_frozen, k4_explorer, k4_artifacts, k4_viz, k4_cli (self-contained oracle)
 - archive/ has no __init__.py — never importable
+
+## k4_theory — Independent Verification Oracle
+- Self-contained theorem mining & proof engine (numpy + sympy + stdlib only)
+- 46+ registered theorems across 5 tiers: T0 (integer), T1 (topology), T2 (closed-form), T3 (parametric), T4 (numerical)
+- S₄ symmetry miner discovers identities from the K4 permutation group
+- Cross-validated against k4_frozen in tests (matrices, projectors match exactly)
+- Does NOT replace k4_frozen — parallel verification, not a kernel swap
+- CLI: `python -m k4_theory [--prove|--mine|--discover]`
+- Makefile: `make theory-prove`, `make theory-mine`, `make theory-all`
 
 ## Key corrections (must not regress)
 - Viewport v0_dir: V[0] - c (centroid toward V0), NOT c - V[0]
@@ -43,14 +53,18 @@ This is the K4 Tetrahedral EM Field Control exploration engine.
 
 ## Test commands
 ```bash
-pytest tests/ -v                    # all 62 tests
-pytest tests/test_imports.py -v     # import rule enforcement (8 tests)
-pytest tests/test_regression.py -v  # I_edge regression + reproducibility
-pytest tests/test_artifacts.py -v   # artifact round-trip + inspect
-pytest tests/test_figures.py -v     # figure generation + artifact integration
-pytest tests/test_realization.py -v # physical realization tests (20 tests)
-python -m k4_cli.run run basic-bz   # end-to-end with figures
-python -m k4_cli.run figures <dir>  # regenerate figures from artifact
+pytest tests/ -v                         # all tests (62 existing + 12 theory)
+pytest tests/test_imports.py -v          # import rule enforcement (8 tests)
+pytest tests/test_theory_miner.py -v     # theory mining tests (12 tests)
+pytest tests/test_regression.py -v       # I_edge regression + reproducibility
+pytest tests/test_artifacts.py -v        # artifact round-trip + inspect
+pytest tests/test_figures.py -v          # figure generation + artifact integration
+pytest tests/test_realization.py -v      # physical realization tests (20 tests)
+python -m k4_theory --prove              # run proof chain only
+python -m k4_theory --mine               # run symmetry miner only
+python -m k4_theory                      # all phases (prove + mine + discover)
+python -m k4_cli.run run basic-bz        # end-to-end with figures
+python -m k4_cli.run figures <dir>       # regenerate figures from artifact
 ```
 
 ## Website (web/)

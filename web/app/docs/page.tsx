@@ -116,6 +116,38 @@ python -m k4_cli.run figures <dir>`}
               python -m k4_frozen.verify_all
             </pre>
           </div>
+
+          <div className="card">
+            <h3>Claims &amp; Theorems</h3>
+            <p>
+              Claim taxonomy, 47 registered theorems across 6 tiers, anchor
+              theorems, and the authoritative vs exploratory distinction.
+            </p>
+            <p style={{ marginTop: "0.5rem" }}>
+              <Link href="/docs/claims/">Full claims &amp; theorem reference &rarr;</Link>
+            </p>
+          </div>
+
+          <div className="card">
+            <h3>Theory Mining</h3>
+            <p>
+              Independent verification oracle: S<sub>4</sub> symmetry miner
+              and candidate discovery engine. Cross-validated against the
+              frozen core in tests.
+            </p>
+            <pre
+              style={{
+                marginTop: "0.5rem",
+                fontSize: "0.8rem",
+                padding: "0.5rem",
+              }}
+            >
+{`python -m k4_theory --prove    # proof chain
+python -m k4_theory --mine     # symmetry miner
+python -m k4_theory --discover # candidates
+python -m k4_theory            # all phases`}
+            </pre>
+          </div>
         </div>
       </section>
     </>

@@ -412,6 +412,23 @@ export default function DemoPage() {
                     VP-01 (centroid) is the control point and carries claim <span className="badge badge-G">[G]</span> — geometry-exact
                     under regular K4. All others are numerical comparison points <span className="badge badge-M">[M]</span>.
                   </p>
+                  <div style={{
+                    marginTop: "0.75rem", padding: "0.5rem 0.6rem",
+                    background: "var(--k4-surface-2)", borderRadius: "6px",
+                    fontSize: "0.75rem",
+                  }}>
+                    <strong style={{ fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--k4-text-muted)" }}>
+                      Why VP-01 is [G] and the rest are [M]
+                    </strong>
+                    <p style={{ margin: "0.25rem 0 0", color: "var(--k4-text-muted)" }}>
+                      At the centroid, the field matrix factorizes exactly:
+                      F<sub>0</sub>·M = &alpha;·S where S is the integer sign matrix
+                      (<strong>SYM.sign</strong>). Cut annihilation F<sub>0</sub>·G = 0 is proven
+                      symbolically (<strong>SYM.F0G</strong>) and to Integer(0) (<strong>INT.CG_zero</strong>).
+                      Away from the centroid, no such closed form exists — those values
+                      are purely numerical.
+                    </p>
+                  </div>
                 </div>
                 <div className="card">
                   <table style={{
@@ -531,6 +548,25 @@ export default function DemoPage() {
                       cycle-space projection. The residual is algebraically zero — a property of the graph
                       topology, not a numerical coincidence.
                     </p>
+                    <div style={{
+                      marginTop: "0.5rem", padding: "0.5rem 0.6rem",
+                      background: "var(--k4-surface-2)", borderRadius: "6px",
+                      fontSize: "0.75rem", fontFamily: "var(--font-mono)",
+                    }}>
+                      <div style={{ color: "var(--k4-text-muted)", marginBottom: "0.35rem", fontFamily: "var(--font-sans)", fontWeight: 600, fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                        Theorem backing
+                      </div>
+                      <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "0.15rem 0.75rem" }}>
+                        <span className="badge badge-G" style={{ fontSize: "0.65rem" }}>[A]</span>
+                        <span><strong>T1.1</strong> M<sup>T</sup>G = 0 — Hodge orthogonality (cycle ⊥ cut)</span>
+                        <span className="badge badge-G" style={{ fontSize: "0.65rem" }}>[A]</span>
+                        <span><strong>INT.CG_zero</strong> C<sub>INT</sub>·G = 0 — cut annihilation to Integer(0)</span>
+                        <span className="badge badge-G" style={{ fontSize: "0.65rem" }}>[G]</span>
+                        <span><strong>T3.1</strong> F·G = 0 — cut currents produce zero field at centroid</span>
+                        <span className="badge badge-G" style={{ fontSize: "0.65rem" }}>[A]</span>
+                        <span><strong>INT.det_CM_32</strong> det(C<sub>INT</sub>·M) = 32 — full controllability</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

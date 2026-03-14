@@ -1,4 +1,4 @@
-.PHONY: verify test test-fast lint scaffold clean
+.PHONY: verify test test-fast lint scaffold clean theory-prove theory-mine theory-all
 
 # Run the 182-check frozen core verification
 verify:
@@ -20,9 +20,21 @@ test-vertical:
 test-imports:
 	pytest tests/test_imports.py -v
 
+# Theory mining — proof chain
+theory-prove:
+	python -m k4_theory --prove
+
+# Theory mining — symmetry miner
+theory-mine:
+	python -m k4_theory --mine
+
+# Theory mining — all phases (prove + mine + discover)
+theory-all:
+	python -m k4_theory
+
 # Lint
 lint:
-	ruff check k4_explorer/ k4_artifacts/ k4_viz/ k4_cli/
+	ruff check k4_explorer/ k4_artifacts/ k4_viz/ k4_cli/ k4_theory/
 
 # Run the BASIC-BZ preset and save artifact
 run-basic:
