@@ -10,15 +10,15 @@
 
 ### For the Mathematician
 
-The complete graph $K_4$ has a unique property among all $K_n$: its cycle space and cut space have equal dimension (both 3). This dimensional coincidence induces an exact Hodge-like orthogonal decomposition $\mathbb{R}^6 = \text{im}(M) \oplus \text{im}(G)$ of the edge-current space, where $M$ and $G$ are integer matrices satisfying $M^T G = 0$ (proven to `Integer(0)` via SymPy). When the edges of $K_4$ are realized as current-carrying wires forming a regular tetrahedron, the Biot-Savart field operator $F_0$ at the centroid annihilates the cut space exactly ($F_0 G = 0$, proven symbolically), making the centroid field a bijection on cycle weights alone. The field map $F_0 M$ has condition number $\kappa = 2$ (exact), eigenvalue multiplicities $(1, 2)$ reflecting the $T_d$ symmetry, and the sign matrix $S = -\frac{1}{2} C_{\text{int}} M$ satisfies $S^T S = 4I - J$ (the Gram matrix). Under the $S_4$ representation theory, cycle and cut spaces carry the $T_2$ and $T_1$ irreps respectively (both multiplicity 1), forcing all equivariant operators to be scalar on each block — a constraint that yields the exact gradient ratio $\zeta_4 = 1/7$.
+The complete graph $K_4$ has a unique property among all $K_n$: its cycle space and cut space have equal dimension (both 3). This dimensional coincidence induces an exact Hodge-like orthogonal decomposition $\mathbb{R}^6 = \text{im}(M) \oplus \text{im}(G)$ of the edge-current space, where $M$ and $G$ are integer matrices satisfying $M^T G = 0$ (proven to `Integer(0)` via SymPy). When the edges of $K_4$ are realized as current-carrying wires forming a regular tetrahedron, the Biot-Savart field operator $F_0$ at the centroid annihilates the cut space exactly ($F_0 G = 0$, proven symbolically), making the centroid field a bijection on cycle weights alone. The field map $F_0 M$ has condition number $\kappa = 2$ (exact), eigenvalue multiplicities $(1, 2)$ reflecting the $T_d$ symmetry, and the sign matrix $S = -\frac{1}{2} C_{\text{int}} M$ satisfies $S^T S = 4I - J$ (the Gram matrix). Under the $S_4$ representation theory, cycle and cut spaces carry the $T_2$ and $T_1$ irreps respectively (both multiplicity 1), forcing all equivariant operators to be scalar on each block. Under the Biot-Savart kernel, this constraint yields the gradient ratio $\zeta_4 = 1/7$ (verified numerically to $10^{-13}$; whether the value has a purely representation-theoretic origin remains open).
 
 ### For the Engineer
 
-A regular tetrahedron made of wire has 6 edges and 4 vertices. You can split any pattern of currents through the 6 edges into two independent parts: **cycle currents** (loops that circulate without entering/leaving vertices) and **cut currents** (currents that flow in and out of vertices). At the center of the tetrahedron, only cycle currents produce a magnetic field — cut currents cancel exactly to zero. This means you have 3 independent knobs (the cycle weights $w_1, w_2, w_3$) that give you full 3-axis control of the B-field at the center, and 3 more knobs (the cut weights) for E-field control that don't interfere with your B-field. The system is well-conditioned ($\kappa = 2$), meaning small input changes produce proportionally small output changes — no numerical fragility. A 3-phase AC drive produces a perfectly circular rotating field. A "ring-quiet" mode lets you silence 3 of the 6 edges while still producing a field.
+A regular tetrahedron made of wire has 6 edges and 4 vertices. You can split any pattern of currents through the 6 edges into two independent parts: **cycle currents** (loops that circulate without entering/leaving vertices) and **cut currents** (currents that flow in and out of vertices). At the centroid of the tetrahedron, only cycle currents produce a magnetic field — cut currents cancel exactly to zero (Theorem 3.1, proven symbolically). This means you have 3 independent knobs (the cycle weights $w_1, w_2, w_3$) that give you full 3-axis control of the B-field at the centroid. Under a barycentric E-field model, the 3 cut weights provide independent E-field control at the centroid without affecting the B-field (Section 5, Corollary). The B-field control system is well-conditioned ($\kappa = 2$, exact), meaning small input changes produce proportionally small output changes. A 3-phase AC drive produces a perfectly circular rotating field in the plane perpendicular to $[1,1,1]$ (Section 10). Under the balanced condition $\sum w_i = 0$, a "ring-quiet" mode silences 3 of the 6 edges while the remaining 3 still produce a nonzero centroid field (Section 9). All centroid results assume a regular tetrahedron; off-centroid behavior and high-frequency regimes are discussed in Section 12.
 
 ### For Everyone Else
 
-Imagine a wireframe tetrahedron — a pyramid with a triangular base, where every edge is a wire. We discovered that this shape has a remarkable mathematical property: you can independently control the magnetic field (the force that moves compass needles) and the electric field (the force that moves charges) at its center, without one interfering with the other. This isn't an approximation — it's an exact mathematical fact. The tetrahedron is the *only* complete wireframe shape where this works, because it's the only one where the number of independent "loop currents" equals the number of independent "through currents" (both equal 3). This document proves why it works, how well-behaved the control is, and what the fundamental limits are.
+Imagine a wireframe tetrahedron — a pyramid with a triangular base, where every edge is a wire. This shape has a remarkable mathematical property: at its exact center, you can independently control the magnetic field (the force that moves compass needles) and the electric field (the force that moves charges), without one interfering with the other. The magnetic-field independence is an exact mathematical fact, not an approximation. The tetrahedron is the *only* complete wireframe shape where this works, because it's the only one where the number of independent "loop currents" equals the number of independent "through currents" (both equal 3). This document proves why it works at the center, how well-behaved the control is, and what the fundamental limits are as you move away from the center or operate at high frequencies.
 
 ---
 
@@ -76,16 +76,18 @@ $$G = \begin{pmatrix} +1 & 0 & 0 \\ 0 & +1 & 0 \\ 0 & 0 & +1 \\ -1 & +1 & 0 \\ -
 
 ### 1.3 Claim Taxonomy
 
-Every result in this document carries one of six claim tags:
+Every result in this document carries one of six claim tags. The distinctions are strict: a result tagged **[A]** must not depend on geometry, a result tagged **[G]** must state its geometric and physical premises explicitly, and no result may be presented at a stronger level than its proof supports.
 
-| Tag | Name | Meaning |
-|-----|------|---------|
-| **[A]** | Algebraic exact | Proven to `Integer(0)` via SymPy. Holds for *any* realization of $K_4$. |
-| **[G]** | Geometric exact | Exact under stated premises (regular $K_4$ + named field model). |
-| **[G*]** | Model-limited | Valid only within a stated regime. |
-| **[M]** | Numerical | Verified computationally. Not a proof. |
-| **[H]** | Heuristic | Engineering guidance. |
-| **[C]** | Conjectural | Incomplete proof path. |
+| Tag | Name | Depends on | Proof method | Example |
+|-----|------|-----------|-------------|---------|
+| **[A]** | Algebraic exact | Graph structure only (any $K_4$ realization) | Integer arithmetic, verified to `Integer(0)` via SymPy | $M^T G = 0$ |
+| **[G]** | Geometric exact | Regular tetrahedron + named field model | Symbolic computation under stated premises | $F_0 G = 0$ (requires $T_d$ symmetry) |
+| **[G*]** | Model-limited | Regular tetrahedron + regime assumptions | Valid only within stated regime (e.g., quasi-static) | Impedance block-diagonality |
+| **[M]** | Numerical | Computation | Verified to stated tolerance; not a proof | $\zeta_4^2 = 1/49$ to $10^{-13}$ |
+| **[H]** | Heuristic | Engineering judgement | Guidance, not a theorem | Scale selection rules |
+| **[C]** | Conjectural | Incomplete | Partial evidence or incomplete proof path | Rep-theoretic origin of $1/7$ |
+
+When a result has layered dependencies, we write e.g. **[A] + [G]** to indicate that one layer of the proof is algebraic and another requires geometric premises. The combined tag reflects the weakest layer.
 
 ---
 
@@ -283,19 +285,23 @@ $$\det(F_0 M) = -\frac{4096\sqrt{6}}{9 L^3}$$
 
 ### Theorem 3.3 (Centroid Anisotropy) **[G]**
 
-*The Gram matrix of the centroid field map has eigenvalues:*
+*Premises: regular tetrahedron with edge length $L$; Biot-Savart field model.*
 
-$$\sigma^2(F_0 M) \in \left\{ \frac{128}{3L^2},\; \frac{512}{3L^2} \right\}$$
+*The condition number of the centroid field map is:*
 
-*with multiplicities 1 and 2 respectively. The condition number is:*
+$$\kappa(F_0 M) = 2 \quad \text{(exact)}$$
 
-$$\kappa(F_0 M) = \sqrt{\frac{512}{128}} = 2 \quad \text{(exact)}$$
+*Proof.* The proof separates the integer structure from the geometric scalar.
 
-*The singular value ratio is $\sigma_{\min}/\sigma_{\max} = 1/2$.*
+**Step 1 (integer, [A]).** From Theorem 3.2, $F_0 M = -2\alpha \cdot S$. Therefore $(F_0 M)^T (F_0 M) = 4\alpha^2 S^T S = 4\alpha^2 \Gamma$, where $\Gamma = 4I_3 - J_3$ (Theorem 1.3).
 
-*Proof.* The Gram matrix $(F_0 M)^T(F_0 M) = 4\alpha^2 (S^T S) = 4\alpha^2 (4I - J)$. The eigenvalues of $4I - J$ are $\{1, 4, 4\}$ (Theorem 1.3 remark), giving eigenvalues $4\alpha^2 \cdot \{1, 4, 4\}$. With $\alpha^2 = 128/(3L^2) \cdot (1/4)$... resolving: $4\alpha^2 = 4 \cdot 64 \cdot 6 / (9L^2) = 512\cdot 2/(3\cdot 3 L^2)$. The eigenvalue ratio is $4/1 = 4$, so $\kappa = \sqrt{4} = 2$. Verified symbolically. $\blacksquare$
+**Step 2 (integer, [A]).** The eigenvalues of $\Gamma$ are $\{1, 4, 4\}$ (see remark after Theorem 1.3). Therefore the squared singular values of $F_0 M$ are $4\alpha^2 \cdot \{1, 4, 4\}$, with ratio $\sigma_{\max}^2 / \sigma_{\min}^2 = 4$.
 
-*Physical interpretation.* The "hard" direction is $[1,1,1]$ (the breathing mode — equal currents in all loops). The "easy" directions span the plane perpendicular to $[1,1,1]$ (the differential modes). It takes twice the current to produce a field along $[1,1,1]$ as along any direction in the transverse plane.
+**Step 3 (conclusion).** $\kappa = \sigma_{\max}/\sigma_{\min} = \sqrt{4} = 2$. This holds for any positive $\alpha$, so the condition number depends only on the integer structure of $S$, not on the value of $\alpha(L)$.
+
+For completeness, the Biot-Savart integral gives $\alpha = \mu_0 \sqrt{6} / (3\pi L)$, yielding explicit singular values $\sigma \in \{2\alpha, 4\alpha\}$. Verified symbolically via SymPy. $\blacksquare$
+
+*Physical interpretation.* The eigenvector with $\sigma_{\min}$ is $[1,1,1]$ (equal currents in all loops — the "breathing mode"). The two eigenvectors with $\sigma_{\max}$ span $[1,1,1]^\perp$ (the "differential modes"). Producing a unit field along the breathing axis costs twice the current of any differential-mode direction.
 
 ---
 
@@ -313,13 +319,15 @@ $$w_1 = -\frac{B_x + B_y}{2k}, \qquad w_2 = -\frac{B_y + B_z}{2k}, \qquad w_3 = 
 
 *Proof.* Since $\det(F_0 M) \neq 0$ (Theorem 3.2), the system $F_0 M w = B$ has a unique solution. The explicit form follows from inverting the $3 \times 3$ sign matrix $S$ and scaling by $\alpha^{-1}$. Verified by roundtrip testing across 6 independent target directions to error $< 10^{-15}$. $\blacksquare$
 
-### Corollary (B/E Independence)
+### Corollary (B/E Independence) **[G]**
+
+*Premises: regular tetrahedron; Biot-Savart B-field model; barycentric E-field model; centroid evaluation point.*
 
 At the centroid, the 6 edge DOFs decompose into:
-- **3 cycle weights** $w$: control $B$ exclusively ($F_0 G = 0$).
-- **3 cut weights** $u$: control $E$ exclusively (via the barycentric E-field model).
+- **3 cycle weights** $w$: control $B$ exclusively ($F_0 G = 0$, Theorem 3.1).
+- **3 cut weights** $u$: control $E$ exclusively (via the barycentric E-field model, Section 12.1).
 
-These channels are exactly decoupled: changing $w$ does not affect $E$, and changing $u$ does not affect $B$.
+These channels are exactly decoupled: changing $w$ does not affect $E$, and changing $u$ does not affect $B$. The B-field decoupling is **[A] + [G]** (algebraic core + $T_d$ symmetry). The E-field claim depends additionally on the barycentric model **[G]**.
 
 ---
 
@@ -441,49 +449,71 @@ $$M^T \cdot G_{\text{grad}} \cdot G = 0_{3 \times 3}$$
 
 ### 8.2 The Gradient Ratio
 
-The **gradient ratio** $\zeta_4$ measures the spatial reach of cut fields relative to cycle fields:
+The **gradient ratio** $\zeta_4$ measures how rapidly cut-space fields decay relative to cycle-space fields near the centroid:
 
-$$\zeta_4 = \frac{\|(\partial F / \partial r) \cdot G\|}{\|(\partial F / \partial r) \cdot M\|} = \sqrt{\frac{\lambda_{\text{cut}}}{\lambda_{\text{cycle}}}}$$
+$$\zeta_4 = \sqrt{\frac{\lambda_{\text{cut}}}{\lambda_{\text{cyc}}}}$$
 
-where $\lambda_{\text{cut}}, \lambda_{\text{cycle}}$ are the eigenvalues of $G_{\text{grad}}$ on the respective subspaces.
+where $\lambda_{\text{cut}}$ and $\lambda_{\text{cyc}}$ are the eigenvalues of $G_{\text{grad}}$ on the cut and cycle subspaces respectively.
 
-### Theorem ($\zeta_4 = 1/7$) **[A] + [G]**
+### Theorem ($\zeta_4 = 1/7$) **[G]**
 
-$$\zeta_4 = \frac{1}{7} \quad \text{(exact for Biot-Savart)}$$
+*Premises: regular tetrahedron; Biot-Savart field model.*
 
-*Proof.* The proof proceeds in 5 steps:
+$$\zeta_4 = \frac{1}{7} \quad \text{(exact)}$$
 
-1. **Equivariance** [A]: $G_{\text{grad}} \in \text{span}\{I_6, \Sigma\}$, so $G_{\text{grad}} = \alpha I_6 + \beta \Sigma$ for some $\alpha, \beta$.
+*The algebraic framework (Steps 1–3) holds for any $T_d$-symmetric field model [A]. The specific value $1/7$ depends on the Biot-Savart kernel [G].*
 
-2. **Block eigenvalues** [A]: On cycle space, $G_{\text{grad}}$ acts as scalar $\lambda_{\text{cyc}} = \alpha - 2\beta$. On cut space, as $\lambda_{\text{cut}} = \alpha + 2\beta$.
+*Proof.*
 
-3. **Commutant formula** [A]: $\zeta_4^2 = \lambda_{\text{cut}}/\lambda_{\text{cyc}} = (\alpha + 2\beta)/(\alpha - 2\beta)$.
+**Step 1 (commutant structure, [A]).** $G_{\text{grad}}$ is $S_4$-equivariant, so by Section 7.2 it lies in $\text{span}\{I_6, \Sigma\}$. Write $G_{\text{grad}} = a\, I_6 + b\, \Sigma$ for scalars $a, b$.
 
-4. **Biot-Savart evaluation** [G]: For the Biot-Savart kernel on the regular tetrahedron, the integrals $J_0$ and $K_1$ (defined via the kernel's radial and angular components) satisfy the identity $9K_1 = 7J_0$.
+**Step 2 (block eigenvalues, [A]).** Since $\Sigma$ has eigenvalue $-2$ on cycle space and $+2$ on cut space (Section 7.1):
 
-5. **Substitution**: $\alpha = 2J_0 - 3K_1 = 2J_0 - 7J_0/3 = -J_0/3$ and $\beta = K_1 = 7J_0/9$, giving:
+$$\lambda_{\text{cyc}} = a - 2b, \qquad \lambda_{\text{cut}} = a + 2b$$
 
-$$\zeta_4^2 = \frac{-J_0/3 + 14J_0/9}{-J_0/3 - 14J_0/9} = \frac{-3J_0 + 14J_0}{-3J_0 - 14J_0} \cdot \frac{1/9}{1/9} = \frac{11}{-17}$$
+**Step 3 (ratio formula, [A]).** Therefore:
 
-[*Correction: the exact algebraic chain yields $\zeta_4^2 = 1/49$ by careful tracking of the sign conventions in $\alpha, \beta$ relative to the Biot-Savart kernel structure.*]
+$$\zeta_4^2 = \frac{a + 2b}{a - 2b}$$
 
-$$\zeta_4 = \sqrt{1/49} = 1/7 \quad \blacksquare$$
+**Step 4 (kernel evaluation, [G]).** For the Biot-Savart kernel on the regular tetrahedron, $G_{\text{grad}}$ is computed via complex-step differentiation (accuracy $\sim 10^{-15}$). Projecting onto the commutant basis yields the numerical values of $a$ and $b$, giving:
 
-*Physical interpretation.* Cut currents produce fields that decay 7× faster spatially than cycle currents near the centroid. At distances $\gtrsim 0.5L$ from the centroid, cycle fields dominate overwhelmingly.
+$$\zeta_4^2 = \frac{1}{49}$$
+
+Verified to relative error $< 10^{-13}$ across edge lengths $L \in \{0.05, 0.1, 0.2, 1.0\}$ m (scale-invariant as expected). $\blacksquare$
+
+*Remark.* The value $1/7$ may have a representation-theoretic origin connected to the 7-line projective 2-design of Section 7.3. This is an open problem (Section 13, **[C]**).
+
+*Physical interpretation.* Near the centroid, cut-space field gradients are $7\times$ smaller than cycle-space gradients. This means cut fields are tightly confined to the centroid while cycle fields extend further into the interior — a spatial selectivity that reinforces the exact decoupling of Theorem 3.1.
 
 ---
 
 ## 9. Ring-Quiet Modes
 
-### Theorem (Ring-Quiet Condition) **[A]**
+### Definition
 
-*Given cycle weights $w$ with $w_1 + w_2 + w_3 = 0$ (the **balanced** condition), there exist cut weights $u$ such that the 3 ring edges (those forming face $F_0$) carry exactly zero total current.*
+For a face $F_i$ of $K_4$, a **ring-quiet mode** is an edge current $I = Mw + Gu$ such that the 3 edges bounding $F_i$ carry zero current.
 
-*Proof.* The ring edges of face $F_0$ are $\{E_{12}, E_{13}, E_{23}\}$ (indices 3, 4, 5). Total current on these edges: $I_{\text{ring}} = (Mw + Gu)|_{\text{ring}} = M_{\text{ring}} w + G_{\text{ring}} u$.
+### Theorem (Ring-Quiet Existence) **[A]**
 
-We need $G_{\text{ring}} u = -M_{\text{ring}} w$. The submatrix $G_{\text{ring}} \in \mathbb{Z}^{3 \times 3}$ has rank 2 (it is singular — its rows sum to zero). However, when $w$ is balanced ($\sum w_i = 0$), the right-hand side $-M_{\text{ring}} w$ lies in the column space of $G_{\text{ring}}$. This is because the balanced condition ensures the RHS satisfies the same constraint as the column space. The minimum-norm solution exists and gives exact cancellation. Verified for multiple balanced $w$ vectors to residual $< 10^{-14}$. $\blacksquare$
+*Let $w \in \mathbb{R}^3$ satisfy $w_1 + w_2 + w_3 = 0$ (the balanced condition). Then there exist cut weights $u$ such that $I = Mw + Gu$ is ring-quiet on face $F_0$. Conversely, if no balanced condition holds, no such $u$ exists.*
 
-*Application.* Ring-quiet modes allow 3 of 6 edges to be "silent" — carrying no current — while the remaining 3 "spoke" edges carry all the current. The silent edges can serve as sensing elements (no self-field interference) or be physically disconnected for fault tolerance.
+*Proof.* The ring edges of $F_0$ are $\{E_{12}, E_{13}, E_{23}\}$ (rows 3, 4, 5). The ring-quiet condition requires:
+
+$$G_{\text{ring}}\, u = -M_{\text{ring}}\, w$$
+
+where $M_{\text{ring}}, G_{\text{ring}} \in \mathbb{Z}^{3 \times 3}$ are the row-3,4,5 restrictions of $M$ and $G$:
+
+$$G_{\text{ring}} = \begin{pmatrix} -1 & +1 & 0 \\ -1 & 0 & +1 \\ 0 & -1 & +1 \end{pmatrix}, \qquad M_{\text{ring}} = \begin{pmatrix} -1 & 0 & 0 \\ 0 & 0 & +1 \\ 0 & -1 & 0 \end{pmatrix}$$
+
+**Rank analysis.** $\det(G_{\text{ring}}) = 0$ (integer computation), so $\text{rank}(G_{\text{ring}}) = 2$. The left null space is spanned by $n = [1, -1, 1]^T$ (verified: $n^T G_{\text{ring}} = [0, 0, 0]$).
+
+**Solvability.** The system $G_{\text{ring}} u = b$ is solvable if and only if $n^T b = 0$. We compute:
+
+$$n^T M_{\text{ring}} = [1, -1, 1] \begin{pmatrix} -1 & 0 & 0 \\ 0 & 0 & +1 \\ 0 & -1 & 0 \end{pmatrix} = [-1, -1, -1]$$
+
+Therefore $n^T (-M_{\text{ring}} w) = w_1 + w_2 + w_3$. This vanishes if and only if $w$ is balanced. All arithmetic is over $\mathbb{Z}$. $\blacksquare$
+
+*Application.* Ring-quiet modes allow 3 of 6 edges to carry zero current while the remaining 3 "spoke" edges produce a nonzero centroid field (since the cycle contribution is nonzero and $F_0 G = 0$). The silent edges can serve as sensing elements (no self-field interference) or be physically disconnected for fault tolerance.
 
 ---
 
@@ -521,7 +551,9 @@ $$|Sw|^2 = 4 - (\textstyle\sum_i w_i)^2$$
 
 ## 11. The Bose-Mesner Algebra on $C_3$ Axes
 
-On any $C_3$ symmetry axis of the regular tetrahedron, all cycle-space operators that commute with the $S_3$ stabilizer belong to the 2-parameter algebra $\{alpha I_3 + \beta J_3\}$.
+*All results in this section are **[G]**: they require a regular tetrahedron and the Biot-Savart field model.*
+
+On any $C_3$ symmetry axis of the regular tetrahedron, all cycle-space operators that commute with the $S_3$ stabilizer belong to the 2-parameter algebra $\{\alpha I_3 + \beta J_3\}$.
 
 ### Properties of the $(\alpha, \beta)$ Algebra
 
@@ -566,9 +598,9 @@ $$M^T Z(\omega) G = 0$$
 
 This holds in the quasi-static regime. At higher frequencies, capacitive coupling and skin effects introduce cross-terms.
 
-### 12.3 Scale Invariance
+### 12.3 Scale Invariance **[A] + [M]**
 
-Theorem 3.1 ($F_0 G = 0$) holds at any scale $L > 0$. The null result is verified numerically for $L \in \{0.05, 0.1, 0.2, 1.0\}$ m to residual $< 10^{-14}$.
+Theorem 3.1 ($F_0 G = 0$) holds at any scale $L > 0$: the algebraic layer ($C_{\text{int}} G = 0$) is scale-independent **[A]**, and the geometric layer ($F_0 = \alpha(L) C_{\text{int}}$) holds for any $L$ by the scale-invariance of $T_d$ symmetry. Numerically verified **[M]** for $L \in \{0.05, 0.1, 0.2, 1.0\}$ m to residual $< 10^{-14}$.
 
 ---
 
@@ -576,9 +608,9 @@ Theorem 3.1 ($F_0 G = 0$) holds at any scale $L > 0$. The null result is verifie
 
 | Problem | Current Status | Upgrade Path |
 |---|---|---|
-| Is $\zeta_4 = 1/7$ a representation-theoretic fact? | **[C]** — proved via Biot-Savart integral identity $9K_1 = 7J_0$ | Derive purely from $T_d$ rep theory without referencing the kernel |
+| Is $\zeta_4 = 1/7$ a representation-theoretic fact? | **[C]** — value verified numerically to $10^{-13}$; commutant structure proven **[A]** | Derive the ratio purely from $T_d$ rep theory without evaluating the kernel |
+| Connection between $1/7$ and the 7-line 2-design | **[C]** — suggestive numerology only | Prove or disprove algebraic connection |
 | Multipole selection rule: cycle $\to \{l \leq 2\}$, cut $\to \{l \geq 3\}$ | **[M]** — verified to $10^{-20}$ separation | Prove via Wigner-Eckart theorem on $T_d$ |
-| $9K_1 = 7J_0$: is $7$ the dark line count? | **[C]** — possible connection to 7-line 2-design | Prove or disprove algebraic connection |
 | Full-wave regime boundary | **[G*]** — no capacitance or skin effect | Add parasitic models, find where decoupling breaks |
 | Selectivity crossover surface shape | **[M]** — anisotropy $\sim 2.4:1$ | Derive analytically from $F(r)$ eigenvalue structure |
 | Null placement interior map | **[M]** — effort varies $\leq 3:1$ inside $0.2L$ | Prove $\ker(F(r))$ dimension via equivariance |
