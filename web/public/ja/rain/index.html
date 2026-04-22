@@ -1,0 +1,1952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>日本GO! · Kana Rain</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700;800&family=Noto+Serif+JP:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ===================== 日本GO! KANA RAIN ===================== */
+
+:root {
+  --paper: #f4ecdc;
+  --paper-2: #e9dfca;
+  --ink: #1a1410;
+  --ink-2: #2e241c;
+  --accent: #c8361f;          /* vermillion / shu-iro */
+  --accent-soft: #d4604a;
+  --gold: #b8944a;
+  --indigo: #1b2944;
+  --sumi: #2a2218;
+  --wash: rgba(26,20,16,0.08);
+}
+
+/* THEME: NIGHT (default) — indigo dusk with moon */
+[data-theme="night"] {
+  --paper: #0e1422;
+  --paper-2: #1a2238;
+  --ink: #f0e8d4;
+  --ink-2: #c9bfa6;
+  --accent: #e85a3a;
+  --accent-soft: #f0886a;
+  --gold: #e8c878;
+  --wash: rgba(240,232,212,0.06);
+}
+
+/* THEME: DAWN — peach/sakura sky */
+[data-theme="dawn"] {
+  --paper: #f8e4d4;
+  --paper-2: #f5d2c0;
+  --ink: #3d1f1a;
+  --ink-2: #6b3a2c;
+  --accent: #c8361f;
+  --accent-soft: #e4796a;
+  --gold: #c88a3a;
+  --wash: rgba(61,31,26,0.06);
+}
+
+/* THEME: WASHI — cream paper (day) */
+[data-theme="washi"] {
+  --paper: #f4ecdc;
+  --paper-2: #ede3cc;
+  --ink: #1a1410;
+  --ink-2: #3e2e22;
+  --accent: #c8361f;
+  --accent-soft: #d4604a;
+  --gold: #b8944a;
+  --wash: rgba(26,20,16,0.08);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { height: 100%; overflow: hidden; }
+
+body {
+  font-family: 'Shippori Mincho', 'Noto Serif JP', Georgia, serif;
+  background: var(--paper);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============ BACKGROUND LAYERS ============ */
+.stage {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: var(--paper);
+}
+
+.bg-gradient {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 110%, var(--paper-2) 0%, var(--paper) 60%);
+  pointer-events: none;
+}
+
+[data-theme="night"] .bg-gradient {
+  background:
+    radial-gradient(ellipse at 50% 110%, #2a3656 0%, #1a2238 40%, #0e1422 80%);
+}
+[data-theme="dawn"] .bg-gradient {
+  background:
+    linear-gradient(180deg, #f8e4d4 0%, #f5c8b0 45%, #e89a88 75%, #b86878 100%);
+}
+[data-theme="washi"] .bg-gradient {
+  background:
+    radial-gradient(ellipse at 50% 0%, #fbf4e3 0%, #f4ecdc 50%, #ede3cc 100%);
+}
+
+/* washi paper texture */
+.bg-texture {
+  position: absolute; inset: 0;
+  background-image:
+    repeating-linear-gradient(23deg, transparent 0, transparent 3px, var(--wash) 3px, var(--wash) 4px),
+    repeating-linear-gradient(97deg, transparent 0, transparent 7px, var(--wash) 7px, var(--wash) 8px);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+[data-theme="zen"] .bg-texture { opacity: 0.25; }
+
+/* sun / moon */
+.celestial {
+  position: absolute;
+  width: 220px; height: 220px;
+  left: calc(50% - 110px);
+  top: 12%;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0.55;
+}
+[data-theme="night"] .celestial {
+  background: radial-gradient(circle, #f0e8d4 0%, #d4c89a 40%, transparent 70%);
+  box-shadow: 0 0 80px rgba(240,232,212,0.3);
+}
+[data-theme="dawn"] .celestial {
+  background: radial-gradient(circle, #fff2d8 0%, #f8c890 50%, transparent 75%);
+  top: 55%;
+  opacity: 0.7;
+}
+[data-theme="washi"] .celestial {
+  background: radial-gradient(circle, var(--accent) 0%, var(--accent) 65%, transparent 70%);
+  opacity: 0.85;
+  width: 160px; height: 160px;
+  left: calc(50% - 80px);
+}
+
+/* mountain silhouette */
+.mountains {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 35%;
+  pointer-events: none;
+  opacity: 0.35;
+}
+[data-theme="zen"] .mountains { display: none; }
+[data-theme="night"] .mountains { opacity: 0.6; }
+
+/* seigaiha wave border at bottom (danger zone) */
+.wave-zone {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 90px;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 4;
+}
+.wave-zone svg {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.wave-zone.danger .wave-fill {
+  animation: waveDanger 0.4s ease-in-out infinite alternate;
+}
+@keyframes waveDanger {
+  from { opacity: 0.4; }
+  to { opacity: 0.95; }
+}
+
+/* ============ HUD ============ */
+.hud {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  padding: 24px 40px 16px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 32px;
+  z-index: 20;
+  align-items: start;
+}
+
+.hud-left, .hud-right, .hud-center {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.hud-right { align-items: flex-end; }
+.hud-center { align-items: center; }
+
+.stat-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-feature-settings: "tnum";
+}
+
+.stat-label {
+  font-family: 'Noto Sans JP', ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  opacity: 0.7;
+}
+
+.stat-val {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 36px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1;
+}
+.stat-val.big {
+  font-size: 48px;
+}
+.stat-val.small { font-size: 22px; opacity: 0.7; }
+
+.score-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* title/logo */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.logo-ja {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+.logo-en {
+  font-family: 'Noto Sans JP', monospace;
+  font-size: 9px;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  border-left: 1px solid var(--ink-2);
+  padding-left: 12px;
+  line-height: 1.3;
+}
+.logo-hanko {
+  width: 36px; height: 36px;
+  background: var(--accent);
+  color: var(--paper);
+  font-family: 'Shippori Mincho', serif;
+  font-size: 18px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transform: rotate(-3deg);
+  box-shadow: 0 2px 0 rgba(0,0,0,0.15);
+}
+
+/* lives as torii / tally */
+.lives {
+  display: flex;
+  gap: 6px;
+  align-items: flex-end;
+}
+.life {
+  width: 14px;
+  height: 32px;
+  position: relative;
+  transition: all 0.4s;
+}
+.life::before, .life::after {
+  content: '';
+  position: absolute;
+  left: -4px; right: -4px;
+  height: 3px;
+  background: var(--accent);
+}
+.life::before { top: 0; }
+.life::after { top: 7px; height: 2px; }
+.life-pillar {
+  position: absolute;
+  left: 2px; top: 4px; bottom: 0;
+  width: 4px;
+  background: var(--accent);
+}
+.life-pillar.r { left: auto; right: 2px; }
+.life.lost {
+  opacity: 0.15;
+  filter: grayscale(1);
+  transform: translateY(4px) rotate(6deg);
+}
+.life.losing {
+  animation: lifeLost 0.7s ease-out forwards;
+}
+@keyframes lifeLost {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.3) rotate(-8deg); }
+  60% { transform: scale(1.1) rotate(4deg); filter: brightness(3); }
+  100% { transform: translateY(4px) rotate(6deg); opacity: 0.15; filter: grayscale(1); }
+}
+
+/* combo bar */
+.combo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  margin-top: 4px;
+}
+.combo-bar {
+  width: 180px;
+  height: 4px;
+  background: var(--wash);
+  position: relative;
+  overflow: hidden;
+}
+.combo-fill {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  background: linear-gradient(90deg, var(--accent-soft), var(--accent), var(--gold));
+  transition: width 0.3s ease;
+}
+.combo-num {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 14px;
+  color: var(--ink-2);
+  font-feature-settings: "tnum";
+}
+.combo-num b {
+  color: var(--accent);
+  font-size: 18px;
+  margin-right: 4px;
+}
+
+/* ============ FALLING KANA ============ */
+.falling-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 30;
+}
+
+.kana {
+  position: absolute;
+  font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+  font-weight: 500;
+  color: var(--ink);
+  user-select: none;
+  transform-origin: center;
+  transition: transform 0.15s, filter 0.2s;
+  will-change: transform;
+}
+
+.kana-inner {
+  position: relative;
+  display: inline-block;
+  padding: 8px 12px;
+}
+
+/* a little sumi-e ink drip behind each char */
+.kana-drip {
+  position: absolute;
+  left: 50%;
+  top: 85%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 22px;
+  background: currentColor;
+  border-radius: 50% 50% 50% 50% / 20% 20% 80% 80%;
+  opacity: 0.12;
+  filter: blur(1px);
+}
+
+/* trailing ghost */
+.kana-trail {
+  position: absolute;
+  inset: 0;
+  color: currentColor;
+  opacity: 0.18;
+  transform: translateY(-18px) scale(0.94);
+  filter: blur(2px);
+}
+.kana-trail.t2 {
+  opacity: 0.08;
+  transform: translateY(-36px) scale(0.88);
+  filter: blur(4px);
+}
+
+/* Night theme: ensure all text elements are legible */
+[data-theme="night"] .stat-val,
+[data-theme="night"] .logo-ja,
+[data-theme="night"] .combo-num,
+[data-theme="night"] .slate-text,
+[data-theme="night"] .slate-hint,
+[data-theme="night"] .kana-char {
+  color: var(--ink);
+}
+[data-theme="night"] .stat-label,
+[data-theme="night"] .logo-en {
+  color: var(--ink-2);
+  opacity: 0.85;
+}
+[data-theme="night"] .slate {
+  background: rgba(14, 20, 34, 0.75);
+  border-color: rgba(240, 232, 212, 0.25);
+}
+[data-theme="night"] .slate-text {
+  color: var(--ink);
+}
+
+/* Night theme: trails & drip glow in accent instead of cream */
+[data-theme="night"] .kana-trail {
+  color: var(--accent-soft);
+  opacity: 0.22;
+}
+[data-theme="night"] .kana-trail.t2 {
+  color: var(--accent);
+  opacity: 0.1;
+}
+[data-theme="night"] .kana-drip {
+  background: var(--accent);
+  opacity: 0.28;
+}
+
+.kana.focused .kana-char {
+  color: var(--accent);
+  text-shadow: 0 0 30px var(--accent);
+  animation: focusPulse 0.4s ease-in-out infinite alternate;
+}
+@keyframes focusPulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.08); }
+}
+
+.kana.near-danger .kana-char {
+  animation: danger 0.35s ease-in-out infinite alternate;
+}
+@keyframes danger {
+  from { color: var(--ink); }
+  to { color: var(--accent); filter: drop-shadow(0 0 12px var(--accent)); }
+}
+
+.kana-char {
+  font-size: 88px;
+  line-height: 1;
+  display: block;
+  position: relative;
+  z-index: 2;
+  transition: color 0.2s, text-shadow 0.2s, transform 0.2s;
+  color: var(--ink);
+}
+/* Digraphs (2-char kana like きゃ) — shrink and tighten */
+.kana-char.digraph {
+  font-size: 56px;
+  letter-spacing: -0.08em;
+  white-space: nowrap;
+}
+
+/* romaji hint below kana, shows progressively */
+.kana-hint {
+  position: absolute;
+  left: 50%;
+  bottom: -20px;
+  transform: translateX(-50%);
+  font-family: 'Noto Sans JP', ui-monospace, monospace;
+  font-size: 13px;
+  letter-spacing: 0.15em;
+  font-weight: 600;
+  color: var(--accent);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.kana.focused .kana-hint { opacity: 1; }
+.kana-hint .typed { color: var(--accent); font-weight: 700; }
+.kana-hint .remain { color: var(--ink-2); opacity: 0.5; }
+
+/* ============ INPUT SLATE ============ */
+.slate-wrap {
+  position: absolute;
+  left: 50%;
+  bottom: 36px;
+  transform: translateX(-50%);
+  z-index: 35;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  pointer-events: none;
+}
+.slate {
+  min-width: 420px;
+  padding: 18px 36px 14px;
+  background: color-mix(in srgb, var(--paper-2) 70%, transparent);
+  border: 1px solid var(--ink-2);
+  border-radius: 2px;
+  position: relative;
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--paper) 60%, transparent),
+    0 0 0 5px color-mix(in srgb, var(--ink-2) 70%, transparent),
+    0 14px 40px rgba(0,0,0,0.15);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+[data-theme="night"] .slate {
+  background: rgba(26, 34, 56, 0.85);
+  backdrop-filter: blur(12px);
+}
+
+.slate-label {
+  position: absolute;
+  top: -18px;
+  left: 20px;
+  background: var(--accent);
+  color: var(--paper);
+  font-family: 'Shippori Mincho', serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  padding: 3px 10px;
+  border-radius: 1px;
+}
+
+.slate-text {
+  font-family: 'Noto Sans JP', ui-monospace, monospace;
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: var(--ink);
+  text-align: center;
+  min-height: 36px;
+  line-height: 1;
+}
+.slate-text .typed-ch {
+  color: var(--accent);
+  position: relative;
+}
+.slate-text .caret {
+  display: inline-block;
+  width: 2px;
+  height: 26px;
+  background: var(--accent);
+  margin-left: 2px;
+  vertical-align: middle;
+  animation: caretBlink 0.8s infinite;
+}
+@keyframes caretBlink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* brush stroke underline */
+.slate-brush {
+  height: 4px;
+  margin-top: 8px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 2px;
+}
+.slate-brush-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--gold));
+  transition: width 0.15s ease;
+  position: relative;
+}
+.slate-brush-fill::after {
+  content: '';
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: 20px;
+  background: linear-gradient(90deg, transparent, var(--gold));
+  filter: blur(2px);
+}
+
+.slate-hint {
+  font-family: 'Noto Sans JP', monospace;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  opacity: 0.6;
+}
+.slate-hint kbd {
+  font-family: inherit;
+  border: 1px solid var(--ink-2);
+  padding: 1px 5px;
+  border-radius: 2px;
+  opacity: 0.8;
+  margin: 0 2px;
+}
+
+/* ============ FLOATING +SCORE ============ */
+.float-score {
+  position: absolute;
+  font-family: 'Shippori Mincho', serif;
+  font-weight: 700;
+  font-size: 28px;
+  color: var(--accent);
+  pointer-events: none;
+  animation: floatUp 1.1s ease-out forwards;
+  z-index: 12;
+  text-shadow: 0 2px 0 var(--paper);
+}
+.float-score.combo-label {
+  font-size: 14px;
+  color: var(--gold);
+  letter-spacing: 0.2em;
+}
+@keyframes floatUp {
+  0% { opacity: 0; transform: translateY(0) scale(0.6); }
+  20% { opacity: 1; transform: translateY(-10px) scale(1.2); }
+  100% { opacity: 0; transform: translateY(-70px) scale(1); }
+}
+
+/* ============ POP EFFECT STYLES ============ */
+.ink-core, .petal-core, .stroke-core, .origami-core, .washi-core {
+  position: absolute;
+  left: 0; top: 0;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 88px;
+  line-height: 1;
+  transform: translate(-50%, -50%);
+  font-weight: 500;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.ink-core {
+  animation: inkCore 0.6s ease-out forwards;
+}
+@keyframes inkCore {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  40% { transform: translate(-50%, -50%) scale(1.4); opacity: 0.7; }
+  100% { transform: translate(-50%, -50%) scale(2.2); opacity: 0; filter: blur(8px); }
+}
+.ink-ring {
+  position: absolute; left: 0; top: 0;
+  width: 20px; height: 20px;
+  transform: translate(-50%, -50%);
+  border: 3px solid;
+  border-radius: 50%;
+  animation: inkRing 0.8s ease-out forwards;
+}
+@keyframes inkRing {
+  0% { width: 20px; height: 20px; opacity: 1; border-width: 3px; }
+  100% { width: 240px; height: 240px; opacity: 0; border-width: 1px; }
+}
+.ink-drop {
+  position: absolute; left: 0; top: 0;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: inkDrop cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+  filter: blur(0.5px);
+}
+@keyframes inkDrop {
+  0% { transform: translate(-50%, -50%) scale(0.2); opacity: 1; }
+  60% { opacity: 0.8; }
+  100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1); opacity: 0; }
+}
+
+.petal-core {
+  color: var(--accent);
+  animation: petalCore 0.5s ease-out forwards;
+}
+@keyframes petalCore {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+}
+.petal {
+  position: absolute; left: 0; top: 0;
+  transform: translate(-50%, -50%);
+  animation: petalFly cubic-bezier(0.3, 0.6, 0.4, 1) forwards;
+}
+@keyframes petalFly {
+  0% { transform: translate(-50%, -50%) scale(0) rotate(0deg); opacity: 0; }
+  15% { transform: translate(-50%, -50%) scale(var(--ds)) rotate(calc(var(--drot) * 0.2)); opacity: 1; }
+  100% {
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy) + 40px)) scale(var(--ds)) rotate(var(--drot));
+    opacity: 0;
+  }
+}
+
+.stroke-core {
+  animation: strokeCore 0.6s ease-out forwards;
+}
+@keyframes strokeCore {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  50% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; filter: blur(0); }
+  100% { transform: translate(-50%, -50%) scale(1.8); opacity: 0; filter: blur(8px); }
+}
+.stroke-ray {
+  position: absolute;
+  left: 0; top: 0;
+  width: 140px; height: 3px;
+  transform-origin: 0 50%;
+  animation: strokeRay ease-out forwards;
+  opacity: 0;
+}
+@keyframes strokeRay {
+  0% { width: 0; opacity: 0; }
+  30% { opacity: 1; }
+  100% { width: 180px; opacity: 0; }
+}
+
+.origami-core {
+  animation: origamiCore 0.5s ease-out forwards;
+}
+@keyframes origamiCore {
+  0% { transform: translate(-50%, -50%) scale(1) rotateY(0); opacity: 1; }
+  50% { transform: translate(-50%, -50%) scale(0.7) rotateY(180deg); opacity: 0.6; }
+  100% { transform: translate(-50%, -50%) scale(0.3) rotateY(360deg); opacity: 0; }
+}
+.origami-shard {
+  position: absolute;
+  left: 0; top: 0;
+  width: 40px; height: 40px;
+  transform: translate(-50%, -50%);
+  animation: origamiShard 0.9s cubic-bezier(0.2, 0.7, 0.4, 1) forwards;
+  opacity: 0;
+}
+@keyframes origamiShard {
+  0% { transform: translate(-50%, -50%) rotate(0) scale(0); opacity: 0; }
+  20% { opacity: 1; transform: translate(-50%, -50%) rotate(calc(var(--drot) * 0.3)) scale(1); }
+  100% {
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy) + 30px)) rotate(var(--drot)) scale(0.6);
+    opacity: 0;
+  }
+}
+
+.washi-core {
+  animation: washiCore 0.4s ease-out forwards;
+}
+@keyframes washiCore {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1.2); opacity: 0; filter: blur(4px); }
+}
+.washi-piece {
+  position: absolute;
+  left: 0; top: 0;
+  transform: translate(-50%, -50%);
+  animation: washiPiece 1s cubic-bezier(0.2, 0.6, 0.3, 1) forwards;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+@keyframes washiPiece {
+  0% { transform: translate(-50%, -50%) rotate(0) scale(1); opacity: 1; }
+  100% {
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy) + 80px)) rotate(var(--drot)) scale(0.8);
+    opacity: 0;
+  }
+}
+
+/* ============ SCREEN SHAKE ============ */
+.stage.shake {
+  animation: shake 0.4s;
+}
+@keyframes shake {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-6px, 4px); }
+  40% { transform: translate(5px, -3px); }
+  60% { transform: translate(-3px, 5px); }
+  80% { transform: translate(4px, -2px); }
+}
+
+/* ============ START / GAMEOVER SCREENS ============ */
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+  background: color-mix(in srgb, var(--paper) 72%, transparent);
+}
+.overlay-card {
+  text-align: center;
+  max-width: 520px;
+  padding: 48px 56px;
+  background: var(--paper-2);
+  border: 1px solid var(--ink-2);
+  box-shadow:
+    0 0 0 6px var(--paper),
+    0 0 0 7px var(--ink-2),
+    0 40px 80px rgba(0,0,0,0.25);
+  position: relative;
+}
+/* stamp is now a real .overlay-stamp element in JSX */
+.overlay-card h1 {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 56px;
+  line-height: 1;
+  margin-bottom: 8px;
+  color: var(--ink);
+}
+.overlay-card h1 .accent {
+  color: var(--accent);
+}
+.overlay-card h2 {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 32px;
+  color: var(--ink);
+  margin-bottom: 16px;
+}
+.overlay-sub {
+  font-family: 'Noto Sans JP', monospace;
+  font-size: 11px;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  margin-bottom: 32px;
+}
+.overlay-stats {
+  display: flex;
+  gap: 32px;
+  justify-content: center;
+  margin: 24px 0 32px;
+  padding: 20px 0;
+  border-top: 1px solid var(--ink-2);
+  border-bottom: 1px solid var(--ink-2);
+}
+.overlay-stat { text-align: center; }
+.overlay-stat-v {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--ink);
+  font-feature-settings: "tnum";
+}
+.overlay-stat-l {
+  font-family: 'Noto Sans JP', monospace;
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 32px;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: 'Shippori Mincho', serif;
+  font-size: 17px;
+  letter-spacing: 0.1em;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s, background 0.15s;
+}
+.btn:hover {
+  background: var(--accent);
+  transform: translateY(-2px);
+}
+.btn .kbd {
+  font-family: 'Noto Sans JP', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  padding: 3px 7px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 2px;
+}
+
+.mode-pick {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin: 20px 0;
+}
+.mode-btn {
+  padding: 10px 18px;
+  background: transparent;
+  border: 1px solid var(--ink-2);
+  color: var(--ink);
+  font-family: 'Shippori Mincho', serif;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.mode-btn.active {
+  background: var(--ink);
+  color: var(--paper);
+}
+.mode-btn:hover { border-color: var(--accent); }
+
+/* ============ TWEAKS PANEL ============ */
+.tweaks {
+  position: fixed;
+  right: 20px;
+  bottom: 160px;
+  width: 280px;
+  background: var(--paper-2);
+  border: 1px solid var(--ink-2);
+  box-shadow: 0 0 0 4px var(--paper), 0 0 0 5px var(--ink-2), 0 20px 50px rgba(0,0,0,0.25);
+  padding: 20px;
+  z-index: 200;
+  font-family: 'Noto Sans JP', sans-serif;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+.tweaks h3 {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 18px;
+  margin-bottom: 4px;
+  color: var(--ink);
+}
+.tweaks .tweaks-sub {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  margin-bottom: 16px;
+  opacity: 0.7;
+}
+.tweak-group {
+  margin-bottom: 16px;
+}
+.tweak-label {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+.tweak-opts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.tweak-opt {
+  padding: 6px 10px;
+  font-size: 12px;
+  background: transparent;
+  border: 1px solid var(--ink-2);
+  color: var(--ink);
+  cursor: pointer;
+  font-family: 'Shippori Mincho', serif;
+  transition: all 0.15s;
+}
+.tweak-opt.active {
+  background: var(--accent);
+  color: var(--paper);
+  border-color: var(--accent);
+}
+.tweak-opt:hover { border-color: var(--accent); }
+
+.tweak-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--ink-2);
+  font-size: 13px;
+  cursor: pointer;
+}
+.tweak-toggle:last-child { border-bottom: none; }
+.toggle-switch {
+  width: 36px;
+  height: 18px;
+  background: var(--ink-2);
+  border-radius: 9px;
+  position: relative;
+  transition: background 0.2s;
+}
+.toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 14px; height: 14px;
+  background: var(--paper);
+  border-radius: 50%;
+  transition: left 0.2s;
+}
+.toggle-switch.on {
+  background: var(--accent);
+}
+.toggle-switch.on::after { left: 20px; }
+
+/* pause overlay */
+.pause-ov {
+  position: fixed;
+  inset: 0;
+  background: color-mix(in srgb, var(--paper) 55%, transparent);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: 60px;
+  z-index: 90;
+  font-family: 'Shippori Mincho', serif;
+  cursor: pointer;
+}
+.pause-badge {
+  text-align: center;
+  pointer-events: none;
+}
+.pause-ov .pause-char {
+  font-size: 140px;
+  color: var(--accent);
+  opacity: 0.85;
+  line-height: 1;
+}
+
+/* Tweaks panel paused state — centered, larger */
+.tweaks-paused {
+  right: 40px;
+  bottom: auto;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 340px;
+  z-index: 200;
+}
+
+/* Overlay stamp (replaces ::before pseudo) */
+.overlay-stamp {
+  position: absolute;
+  top: -14px; right: -14px;
+  background: var(--accent);
+  color: var(--paper);
+  font-family: 'Shippori Mincho', serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 6px 10px;
+  transform: rotate(5deg);
+  box-shadow: 0 2px 0 rgba(0,0,0,0.15);
+  line-height: 1;
+}
+
+/* screen flash */
+.flash {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: var(--accent);
+  opacity: 0;
+  z-index: 50;
+  mix-blend-mode: overlay;
+}
+.flash.on { animation: flash 0.3s ease-out; }
+@keyframes flash {
+  0% { opacity: 0.6; }
+  100% { opacity: 0; }
+}
+
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+const TWEAK_DEFAULTS = {
+  "theme": "night",
+  "popEffect": "stroke",
+  "trails": true,
+  "drip": true,
+  "hiraBasic": true,
+  "hiraDakuten": true,
+  "hiraDigraphs": true,
+  "kataBasic": false,
+  "kataDakuten": true,
+  "kataDigraphs": true
+};
+window.TWEAK_DEFAULTS = TWEAK_DEFAULTS;
+</script>
+
+<script>
+// Kana datasets — hiragana + katakana with romaji
+
+window.HIRAGANA_BASIC = [
+  ['あ','a'],['い','i'],['う','u'],['え','e'],['お','o'],
+  ['か','ka'],['き','ki'],['く','ku'],['け','ke'],['こ','ko'],
+  ['さ','sa'],['し','shi'],['す','su'],['せ','se'],['そ','so'],
+  ['た','ta'],['ち','chi'],['つ','tsu'],['て','te'],['と','to'],
+  ['な','na'],['に','ni'],['ぬ','nu'],['ね','ne'],['の','no'],
+  ['は','ha'],['ひ','hi'],['ふ','fu'],['へ','he'],['ほ','ho'],
+  ['ま','ma'],['み','mi'],['む','mu'],['め','me'],['も','mo'],
+  ['や','ya'],['ゆ','yu'],['よ','yo'],
+  ['ら','ra'],['り','ri'],['る','ru'],['れ','re'],['ろ','ro'],
+  ['わ','wa'],['を','wo'],['ん','n']
+];
+
+window.HIRAGANA_DAKUTEN = [
+  ['が','ga'],['ぎ','gi'],['ぐ','gu'],['げ','ge'],['ご','go'],
+  ['ざ','za'],['じ','ji'],['ず','zu'],['ぜ','ze'],['ぞ','zo'],
+  ['だ','da'],['ぢ','ji'],['づ','zu'],['で','de'],['ど','do'],
+  ['ば','ba'],['び','bi'],['ぶ','bu'],['べ','be'],['ぼ','bo'],
+  ['ぱ','pa'],['ぴ','pi'],['ぷ','pu'],['ぺ','pe'],['ぽ','po']
+];
+
+window.HIRAGANA_DIGRAPHS = [
+  ['きゃ','kya'],['きゅ','kyu'],['きょ','kyo'],
+  ['しゃ','sha'],['しゅ','shu'],['しょ','sho'],
+  ['ちゃ','cha'],['ちゅ','chu'],['ちょ','cho'],
+  ['にゃ','nya'],['にゅ','nyu'],['にょ','nyo'],
+  ['ひゃ','hya'],['ひゅ','hyu'],['ひょ','hyo'],
+  ['みゃ','mya'],['みゅ','myu'],['みょ','myo'],
+  ['りゃ','rya'],['りゅ','ryu'],['りょ','ryo'],
+  ['ぎゃ','gya'],['ぎゅ','gyu'],['ぎょ','gyo'],
+  ['じゃ','ja'],['じゅ','ju'],['じょ','jo'],
+  ['びゃ','bya'],['びゅ','byu'],['びょ','byo'],
+  ['ぴゃ','pya'],['ぴゅ','pyu'],['ぴょ','pyo']
+];
+
+window.KATAKANA_BASIC = [
+  ['ア','a'],['イ','i'],['ウ','u'],['エ','e'],['オ','o'],
+  ['カ','ka'],['キ','ki'],['ク','ku'],['ケ','ke'],['コ','ko'],
+  ['サ','sa'],['シ','shi'],['ス','su'],['セ','se'],['ソ','so'],
+  ['タ','ta'],['チ','chi'],['ツ','tsu'],['テ','te'],['ト','to'],
+  ['ナ','na'],['ニ','ni'],['ヌ','nu'],['ネ','ne'],['ノ','no'],
+  ['ハ','ha'],['ヒ','hi'],['フ','fu'],['ヘ','he'],['ホ','ho'],
+  ['マ','ma'],['ミ','mi'],['ム','mu'],['メ','me'],['モ','mo'],
+  ['ヤ','ya'],['ユ','yu'],['ヨ','yo'],
+  ['ラ','ra'],['リ','ri'],['ル','ru'],['レ','re'],['ロ','ro'],
+  ['ワ','wa'],['ヲ','wo'],['ン','n']
+];
+
+window.KATAKANA_DAKUTEN = [
+  ['ガ','ga'],['ギ','gi'],['グ','gu'],['ゲ','ge'],['ゴ','go'],
+  ['ザ','za'],['ジ','ji'],['ズ','zu'],['ゼ','ze'],['ゾ','zo'],
+  ['ダ','da'],['ヂ','ji'],['ヅ','zu'],['デ','de'],['ド','do'],
+  ['バ','ba'],['ビ','bi'],['ブ','bu'],['ベ','be'],['ボ','bo'],
+  ['パ','pa'],['ピ','pi'],['プ','pu'],['ペ','pe'],['ポ','po']
+];
+
+window.KATAKANA_DIGRAPHS = [
+  ['キャ','kya'],['キュ','kyu'],['キョ','kyo'],
+  ['シャ','sha'],['シュ','shu'],['ショ','sho'],
+  ['チャ','cha'],['チュ','chu'],['チョ','cho'],
+  ['ニャ','nya'],['ニュ','nyu'],['ニョ','nyo'],
+  ['ヒャ','hya'],['ヒュ','hyu'],['ヒョ','hyo'],
+  ['ミャ','mya'],['ミュ','myu'],['ミョ','myo'],
+  ['リャ','rya'],['リュ','ryu'],['リョ','ryo'],
+  ['ギャ','gya'],['ギュ','gyu'],['ギョ','gyo'],
+  ['ジャ','ja'],['ジュ','ju'],['ジョ','jo'],
+  ['ビャ','bya'],['ビュ','byu'],['ビョ','byo'],
+  ['ピャ','pya'],['ピュ','pyu'],['ピョ','pyo']
+];
+
+// backwards-compat aliases used in game.jsx
+window.HIRAGANA = window.HIRAGANA_BASIC;
+window.KATAKANA = window.KATAKANA_BASIC;
+
+</script>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.26.9/babel.min.js" crossorigin="anonymous"></script>
+
+<script type="text/babel">
+// Pop effect renderers — each takes {x, y, kana, theme} and returns JSX
+// Effects are positioned absolute at x,y of where the kana was caught.
+
+const { useEffect, useState, useRef, useMemo } = React;
+
+// ============ 1. INK SPLASH ============
+function InkSplash({ x, y, kana, accent }) {
+  const drops = useMemo(() => {
+    return Array.from({ length: 14 }, (_, i) => {
+      const angle = (i / 14) * Math.PI * 2 + Math.random() * 0.4;
+      const dist = 40 + Math.random() * 90;
+      const size = 6 + Math.random() * 18;
+      return {
+        x: Math.cos(angle) * dist,
+        y: Math.sin(angle) * dist,
+        size,
+        delay: Math.random() * 80,
+        dur: 600 + Math.random() * 400,
+      };
+    });
+  }, []);
+  return (
+    <div style={{ position: 'absolute', left: x, top: y, pointerEvents: 'none', zIndex: 10 }}>
+      <div className="ink-core" style={{ color: accent }}>{kana}</div>
+      <div className="ink-ring" style={{ borderColor: accent }} />
+      {drops.map((d, i) => (
+        <div key={i} className="ink-drop" style={{
+          '--dx': d.x + 'px', '--dy': d.y + 'px',
+          width: d.size, height: d.size,
+          background: accent,
+          animationDelay: d.delay + 'ms',
+          animationDuration: d.dur + 'ms',
+        }} />
+      ))}
+    </div>
+  );
+}
+
+// ============ 2. CHERRY PETAL BURST ============
+function PetalBurst({ x, y, kana, accent }) {
+  const petals = useMemo(() => Array.from({ length: 16 }, (_, i) => {
+    const angle = (i / 16) * Math.PI * 2 + Math.random() * 0.5;
+    const dist = 60 + Math.random() * 140;
+    return {
+      x: Math.cos(angle) * dist,
+      y: Math.sin(angle) * dist - 20,
+      rot: Math.random() * 720 - 360,
+      scale: 0.6 + Math.random() * 0.8,
+      delay: Math.random() * 100,
+      dur: 900 + Math.random() * 600,
+      hue: 340 + Math.random() * 20,
+    };
+  }), []);
+  return (
+    <div style={{ position: 'absolute', left: x, top: y, pointerEvents: 'none', zIndex: 10 }}>
+      <div className="petal-core">{kana}</div>
+      {petals.map((p, i) => (
+        <svg key={i} className="petal" style={{
+          '--dx': p.x + 'px', '--dy': p.y + 'px',
+          '--drot': p.rot + 'deg', '--ds': p.scale,
+          animationDelay: p.delay + 'ms',
+          animationDuration: p.dur + 'ms',
+        }} viewBox="0 0 20 20" width="20" height="20">
+          <path d="M10 2 Q14 6 14 10 Q14 14 10 18 Q6 14 6 10 Q6 6 10 2 Z"
+                fill={`oklch(0.82 0.12 ${p.hue})`} />
+          <path d="M10 2 Q11 6 10 10 Q9 14 10 18" stroke={`oklch(0.65 0.15 ${p.hue})`} strokeWidth="0.5" fill="none" opacity="0.5"/>
+        </svg>
+      ))}
+    </div>
+  );
+}
+
+// ============ 3. STROKE DISSOLVE (light trails) ============
+function StrokeDissolve({ x, y, kana, accent }) {
+  const rays = useMemo(() => Array.from({ length: 8 }, (_, i) => ({
+    angle: (i / 8) * 360,
+    dur: 500 + Math.random() * 200,
+  })), []);
+  return (
+    <div style={{ position: 'absolute', left: x, top: y, pointerEvents: 'none', zIndex: 10 }}>
+      <div className="stroke-core" style={{ color: accent, textShadow: `0 0 40px ${accent}, 0 0 80px ${accent}` }}>
+        {kana}
+      </div>
+      {rays.map((r, i) => (
+        <div key={i} className="stroke-ray" style={{
+          background: `linear-gradient(90deg, ${accent}, transparent)`,
+          transform: `rotate(${r.angle}deg)`,
+          animationDuration: r.dur + 'ms',
+        }} />
+      ))}
+    </div>
+  );
+}
+
+// ============ 4. ORIGAMI FOLD ============
+function OrigamiFold({ x, y, kana, accent }) {
+  const shards = useMemo(() => Array.from({ length: 6 }, (_, i) => {
+    const angle = (i / 6) * Math.PI * 2;
+    return {
+      x: Math.cos(angle) * 70,
+      y: Math.sin(angle) * 70,
+      rot: Math.random() * 360,
+      delay: i * 20,
+    };
+  }), []);
+  return (
+    <div style={{ position: 'absolute', left: x, top: y, pointerEvents: 'none', zIndex: 10 }}>
+      <div className="origami-core" style={{ color: accent }}>{kana}</div>
+      {shards.map((s, i) => (
+        <div key={i} className="origami-shard" style={{
+          '--dx': s.x + 'px', '--dy': s.y + 'px', '--drot': s.rot + 'deg',
+          animationDelay: s.delay + 'ms',
+          background: `linear-gradient(135deg, ${accent}, transparent)`,
+          clipPath: i % 2 ? 'polygon(0 0, 100% 0, 50% 100%)' : 'polygon(0 0, 100% 50%, 0 100%)',
+        }} />
+      ))}
+    </div>
+  );
+}
+
+// ============ 5. WASHI TEAR ============
+function WashiTear({ x, y, kana, accent }) {
+  const pieces = useMemo(() => Array.from({ length: 10 }, (_, i) => {
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 50 + Math.random() * 120;
+    return {
+      x: Math.cos(angle) * dist,
+      y: Math.sin(angle) * dist,
+      rot: Math.random() * 180 - 90,
+      w: 20 + Math.random() * 30,
+      h: 14 + Math.random() * 20,
+      delay: Math.random() * 60,
+    };
+  }), []);
+  return (
+    <div style={{ position: 'absolute', left: x, top: y, pointerEvents: 'none', zIndex: 10 }}>
+      <div className="washi-core" style={{ color: accent }}>{kana}</div>
+      {pieces.map((p, i) => (
+        <div key={i} className="washi-piece" style={{
+          '--dx': p.x + 'px', '--dy': p.y + 'px', '--drot': p.rot + 'deg',
+          width: p.w, height: p.h,
+          animationDelay: p.delay + 'ms',
+          background: `linear-gradient(${Math.random()*180}deg, rgba(255,245,225,0.95), rgba(255,230,200,0.7))`,
+          border: `1px solid ${accent}33`,
+          borderRadius: `${Math.random()*20}% ${Math.random()*30}% ${Math.random()*20}% ${Math.random()*30}%`,
+        }} />
+      ))}
+    </div>
+  );
+}
+
+const POP_EFFECTS = {
+  ink: InkSplash,
+  petal: PetalBurst,
+  stroke: StrokeDissolve,
+  origami: OrigamiFold,
+  washi: WashiTear,
+};
+
+window.POP_EFFECTS = POP_EFFECTS;
+
+</script>
+<script type="text/babel">
+// Background decorative layers
+const { useEffect: useEffect_bg } = React;
+
+function BackgroundLayers({ theme }) {
+  return (
+    <>
+      <div className="bg-gradient" />
+      <div className="bg-texture" />
+      <div className="celestial" />
+      <MountainLayer />
+      <FloatingPetals theme={theme} />
+    </>
+  );
+}
+
+function MountainLayer() {
+  return (
+    <svg className="mountains" viewBox="0 0 1600 400" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="mtn" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0" stopColor="currentColor" stopOpacity="0.4"/>
+          <stop offset="1" stopColor="currentColor" stopOpacity="0.85"/>
+        </linearGradient>
+      </defs>
+      <path d="M0,400 L0,240 L120,190 L220,260 L340,140 L460,220 L560,170 L700,260 L820,180 L960,250 L1100,160 L1240,240 L1380,190 L1500,250 L1600,210 L1600,400 Z"
+            fill="url(#mtn)" />
+      <path d="M0,400 L0,320 L180,280 L320,330 L480,260 L640,320 L820,270 L980,320 L1160,280 L1340,330 L1500,290 L1600,320 L1600,400 Z"
+            fill="currentColor" opacity="0.5"/>
+    </svg>
+  );
+}
+
+// ambient drifting petals (background atmosphere)
+function FloatingPetals({ theme }) {
+  const petals = React.useMemo(() => Array.from({length: 14}, (_,i) => ({
+    left: Math.random() * 100,
+    dur: 18 + Math.random() * 20,
+    delay: -Math.random() * 20,
+    size: 8 + Math.random() * 10,
+    drift: (Math.random() - 0.5) * 120,
+    rot: Math.random() * 360,
+  })), []);
+  return (
+    <div style={{position:'absolute', inset:0, pointerEvents:'none', overflow:'hidden', zIndex: 1}}>
+      {petals.map((p, i) => (
+        <svg key={i} viewBox="0 0 20 20" width={p.size} height={p.size}
+             style={{
+               position: 'absolute',
+               left: p.left + '%',
+               top: '-20px',
+               animation: `drift ${p.dur}s linear infinite`,
+               animationDelay: p.delay + 's',
+               '--drift': p.drift + 'px',
+               opacity: 0.55,
+             }}>
+          <path d="M10 2 Q14 6 14 10 Q14 14 10 18 Q6 14 6 10 Q6 6 10 2 Z"
+                fill={theme === 'night' ? '#f0d8c0' : theme === 'dawn' ? '#e85a7a' : '#d4604a'} />
+        </svg>
+      ))}
+      <style>{`
+        @keyframes drift {
+          0% { transform: translateY(0) translateX(0) rotate(0deg); }
+          100% { transform: translateY(110vh) translateX(var(--drift)) rotate(720deg); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+// Seigaiha wave pattern for danger zone
+function WaveZone({ danger, theme }) {
+  return (
+    <div className={`wave-zone ${danger ? 'danger' : ''}`}>
+      <svg viewBox="0 0 1600 90" preserveAspectRatio="none">
+        <defs>
+          <pattern id="seig" x="0" y="0" width="40" height="20" patternUnits="userSpaceOnUse">
+            <path d="M0,20 A20,20 0 0,1 40,20" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.5"/>
+            <path d="M-20,20 A20,20 0 0,1 20,20" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.5"/>
+            <path d="M20,20 A20,20 0 0,1 60,20" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.5"/>
+          </pattern>
+        </defs>
+        <rect className="wave-fill" x="0" y="0" width="1600" height="90"
+              fill={danger ? 'var(--accent)' : 'currentColor'}
+              opacity={danger ? 0.5 : 0.12}/>
+        <rect x="0" y="0" width="1600" height="90" fill="url(#seig)" opacity="0.7"/>
+        <line x1="0" y1="0" x2="1600" y2="0" stroke={danger ? 'var(--accent)' : 'var(--ink-2)'}
+              strokeWidth={danger ? 2 : 1} opacity={danger ? 1 : 0.4}/>
+      </svg>
+    </div>
+  );
+}
+
+// HUD - top bar
+function HUD({ score, hi, level, lives, losingLife, combo, maxCombo }) {
+  const comboPct = Math.min(100, (combo / 10) * 100);
+  return (
+    <div className="hud">
+      <div className="hud-left">
+        <div className="logo">
+          <div className="logo-hanko">日</div>
+          <div>
+            <div className="logo-ja">日本GO!</div>
+            <div className="logo-en">Kana Rain<br/>仮名の雨</div>
+          </div>
+        </div>
+        <div className="stat-row" style={{marginTop: 12}}>
+          <span className="stat-label">Level</span>
+          <span className="stat-val" style={{fontSize: 26}}>{String(level).padStart(2,'0')}</span>
+        </div>
+      </div>
+
+      <div className="hud-center">
+        <span className="stat-label">Score · 点数</span>
+        <span className="stat-val big">{score.toLocaleString()}</span>
+        <div style={{display:'flex', gap: 14, marginTop: 4}}>
+          <span className="stat-label">Hi · 最高</span>
+          <span className="stat-val small">{hi.toLocaleString()}</span>
+        </div>
+      </div>
+
+      <div className="hud-right">
+        <div>
+          <div className="stat-label" style={{textAlign:'right', marginBottom: 6}}>Lives · 命</div>
+          <div className="lives">
+            {[0,1,2].map(i => (
+              <div key={i} className={`life ${i >= lives ? 'lost' : ''} ${losingLife === i ? 'losing' : ''}`}>
+                <div className="life-pillar" />
+                <div className="life-pillar r" />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="combo">
+          <div className="combo-num"><b>×{combo}</b>combo · max {maxCombo}</div>
+          <div className="combo-bar">
+            <div className="combo-fill" style={{width: comboPct + '%'}}/>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+window.BackgroundLayers = BackgroundLayers;
+window.WaveZone = WaveZone;
+window.HUD = HUD;
+
+</script>
+<script type="text/babel">
+// Main game component
+const { useState: useStateM, useEffect: useEffectM, useRef: useRefM, useMemo: useMemoM, useCallback } = React;
+
+// ---- Pop Preview (live demo in tweaks) ----
+function PopPreview({ effect }) {
+  const [key, setKey] = useStateM(0);
+  useEffectM(() => {
+    setKey(k => k + 1); // fire immediately on effect change
+    const id = setInterval(() => setKey(k => k + 1), 2200);
+    return () => clearInterval(id);
+  }, [effect]);
+  const allEffects = window.POP_EFFECTS || {};
+  const Effect = allEffects[effect] || allEffects.ink;
+  if (!Effect) return <div style={{width:130,height:130,background:'var(--paper)',border:'1px solid var(--ink-2)'}} />;
+  return (
+    <div style={{
+      position:'relative', width:130, height:130, flexShrink:0,
+      background:'var(--paper)', border:'1px solid var(--ink-2)',
+      overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center',
+    }}>
+      <Effect key={key} x={65} y={65} kana="語" accent="var(--accent)" />
+      <div style={{
+        position:'absolute', bottom:4, left:0, right:0, textAlign:'center',
+        fontFamily:'Noto Sans JP, monospace', fontSize:9, letterSpacing:'0.2em',
+        textTransform:'uppercase', color:'var(--ink-2)', opacity:0.6,
+      }}>preview</div>
+    </div>
+  );
+}
+
+function Game() {
+  // --- TWEAKS ---
+  const [tweaks, setTweaks] = useStateM(window.TWEAK_DEFAULTS);
+  const [tweaksOpen, setTweaksOpen] = useStateM(false);
+
+  // --- GAME STATE ---
+  const [screen, setScreen] = useStateM('start');
+  const [score, setScore] = useStateM(0);
+  const [hi, setHi] = useStateM(() => parseInt(localStorage.getItem('kanaHi') || '0'));
+  const [level, setLevel] = useStateM(1);
+  const [lives, setLives] = useStateM(3);
+  const [losingLife, setLosingLife] = useStateM(null);
+  const [combo, setCombo] = useStateM(0);
+  const [maxCombo, setMaxCombo] = useStateM(0);
+  const [caught, setCaught] = useStateM(0);
+  const [missed, setMissed] = useStateM(0);
+
+  const fallingRef = useRefM([]);
+  const [falling, setFalling] = useStateM([]); // snapshot for render; truth is fallingRef
+  const [typed, setTyped] = useStateM('');
+  const [pops, setPops] = useStateM([]);
+  const [floaters, setFloaters] = useStateM([]);
+  const [shake, setShake] = useStateM(false);
+  const [flash, setFlash] = useStateM(false);
+
+  const stageRef = useRefM();
+  const lastSpawn = useRefM(0);
+  const rafId = useRefM(null);
+  const datasetRef = useRefM(dataset);
+  const levelRef = useRefM(level);
+  const screenRef = useRefM(screen);
+  useEffectM(() => { datasetRef.current = dataset; }, [dataset]);
+  useEffectM(() => { levelRef.current = level; }, [level]);
+  useEffectM(() => { screenRef.current = screen; }, [screen]);
+
+  // Build dataset from tweaks flags — guard against undefined arrays
+  const dataset = useMemoM(() => {
+    const sets = [];
+    const add = (arr) => { if (arr && arr.length) sets.push(...arr); };
+    if (tweaks.hiraBasic)    add(window.HIRAGANA_BASIC);
+    if (tweaks.hiraDakuten)  add(window.HIRAGANA_DAKUTEN);
+    if (tweaks.hiraDigraphs) add(window.HIRAGANA_DIGRAPHS);
+    if (tweaks.kataBasic)    add(window.KATAKANA_BASIC);
+    if (tweaks.kataDakuten)  add(window.KATAKANA_DAKUTEN);
+    if (tweaks.kataDigraphs) add(window.KATAKANA_DIGRAPHS);
+    return sets.length > 0 ? sets : (window.HIRAGANA_BASIC || [['あ','a']]);
+  }, [tweaks.hiraBasic, tweaks.hiraDakuten, tweaks.hiraDigraphs,
+      tweaks.kataBasic, tweaks.kataDakuten, tweaks.kataDigraphs]);
+
+  // ------- GAME LOOP — runs once, checks screenRef internally -------
+  useEffectM(() => {
+    let last = performance.now();
+    const loop = (t) => {
+      rafId.current = requestAnimationFrame(loop);
+      if (screenRef.current !== 'play') return;
+      const dt = Math.min(48, t - last);
+      last = t;
+      const W = window.innerWidth;
+      const H = window.innerHeight;
+      const dangerY = H - 110;
+      const lv = levelRef.current;
+      const ds = datasetRef.current;
+
+      const next = [];
+      let hitBottom = false;
+      for (const k of fallingRef.current) {
+        const ny = k.y + k.vy * (dt / 16);
+        if (ny > dangerY) { hitBottom = true; continue; }
+        next.push({ ...k, y: ny, rotation: k.rotation + k.rotSpeed * (dt / 16) });
+      }
+
+      const spawnEvery = Math.max(900, 2200 - lv * 140);
+      if (t - lastSpawn.current > spawnEvery && ds && ds.length > 0) {
+        lastSpawn.current = t;
+        const entry = ds[Math.floor(Math.random() * ds.length)];
+        const [kana, romaji] = entry;
+        const isDigraph = kana.length > 1;
+        const margin = isDigraph ? 160 : 120;
+        const x = margin + Math.random() * (W - margin * 2);
+        const speed = 0.35 + lv * 0.08 + Math.random() * 0.2;
+        next.push({
+          id: Math.random().toString(36).slice(2),
+          kana, romaji, x, y: -60, vy: speed, isDigraph,
+          rotation: (Math.random() - 0.5) * 4,
+          rotSpeed: (Math.random() - 0.5) * 0.06,
+        });
+      }
+
+      fallingRef.current = next;
+      setFalling([...next]);
+
+      if (hitBottom) {
+        setLives(lv => {
+          const nl = lv - 1;
+          setLosingLife(nl);
+          setTimeout(() => setLosingLife(null), 700);
+          if (nl <= 0) setTimeout(() => setScreen('gameover'), 400);
+          return nl;
+        });
+        setCombo(0);
+        setMissed(m => m + 1);
+        setShake(true); setFlash(true);
+        setTimeout(() => { setShake(false); setFlash(false); }, 400);
+      }
+    };
+    rafId.current = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(rafId.current);
+  }, []);
+
+  useEffectM(() => {
+    const newLevel = Math.floor(caught / 8) + 1;
+    if (newLevel > level) setLevel(newLevel);
+  }, [caught, level]);
+
+  // ------- INPUT -------
+  useEffectM(() => {
+    const onKey = (e) => {
+      if (e.key === 'Escape') {
+        if (screen === 'play') { setScreen('pause'); setTweaksOpen(true); }
+        else if (screen === 'pause') { setScreen('play'); setTweaksOpen(false); }
+        return;
+      }
+      if ((screen === 'start' || screen === 'gameover') && (e.key === 'Enter' || e.key === ' ')) {
+        startGame(); return;
+      }
+      if (screen !== 'play') return;
+      if (e.key === 'Backspace') { setTyped(t => t.slice(0, -1)); return; }
+      if (/^[a-zA-Z]$/.test(e.key)) {
+        const nextTyped = (typed + e.key).toLowerCase();
+        const matches = fallingRef.current.filter(k => k.romaji.startsWith(nextTyped));
+        if (matches.length === 0) {
+          setTyped('');
+          setShake(true); setTimeout(() => setShake(false), 200);
+          return;
+        }
+        const exact = matches.filter(k => k.romaji === nextTyped);
+        if (exact.length > 0) {
+          popKana(exact.sort((a,b) => b.y - a.y)[0]);
+          setTyped('');
+        } else {
+          setTyped(nextTyped);
+        }
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [screen, typed, falling]);
+
+  const popKana = useCallback((k) => {
+    fallingRef.current = fallingRef.current.filter(x => x.id !== k.id);
+    setFalling([...fallingRef.current]);
+    const points = 100 * (1 + Math.floor(combo / 3));
+    setScore(s => {
+      const ns = s + points;
+      if (ns > hi) { setHi(ns); localStorage.setItem('kanaHi', String(ns)); }
+      return ns;
+    });
+    setCombo(c => { const nc = c+1; setMaxCombo(m => Math.max(m,nc)); return nc; });
+    setCaught(n => n + 1);
+    const popId = Math.random().toString(36).slice(2);
+    setPops(p => [...p, { id: popId, x: k.x, y: k.y, kana: k.kana, effect: tweaks.popEffect }]);
+    setTimeout(() => setPops(p => p.filter(x => x.id !== popId)), 1400);
+    const floatId = Math.random().toString(36).slice(2);
+    setFloaters(f => [...f, { id: floatId, x: k.x, y: k.y - 20, text: '+' + points, combo: combo+1 >= 3 ? combo+1 : 0 }]);
+    setTimeout(() => setFloaters(f => f.filter(x => x.id !== floatId)), 1100);
+  }, [combo, hi, tweaks.popEffect]);
+
+  const startGame = () => {
+    fallingRef.current = [];
+    setScore(0); setLevel(1); setLives(3); setCombo(0); setMaxCombo(0);
+    setCaught(0); setMissed(0); setFalling([]); setTyped('');
+    setPops([]); setFloaters([]); setLosingLife(null); setTweaksOpen(false);
+    lastSpawn.current = performance.now();
+    setScreen('play');
+  };
+
+  // ------- TWEAKS protocol -------
+  useEffectM(() => {
+    const onMsg = (e) => {
+      if (e.data?.type === '__activate_edit_mode') setTweaksOpen(true);
+      if (e.data?.type === '__deactivate_edit_mode') { setTweaksOpen(false); if (screen === 'pause') setScreen('play'); }
+    };
+    window.addEventListener('message', onMsg);
+    window.parent.postMessage({type: '__edit_mode_available'}, '*');
+    return () => window.removeEventListener('message', onMsg);
+  }, [screen]);
+
+  const setTweak = (key, val) => {
+    setTweaks(prev => ({...prev, [key]: val}));
+    window.parent.postMessage({type: '__edit_mode_set_keys', edits: {[key]: val}}, '*');
+  };
+
+  const dangerY = typeof window !== 'undefined' ? window.innerHeight - 220 : 800;
+
+  return (
+    <div ref={stageRef} className={`stage ${shake ? 'shake' : ''}`} data-theme={tweaks.theme}>
+      <BackgroundLayers theme={tweaks.theme} />
+
+      <div className="falling-layer">
+        {falling.map(k => {
+          const isFocused = typed && k.romaji.startsWith(typed);
+          const isDanger = k.y > dangerY;
+          return (
+            <div key={k.id}
+                 className={`kana ${isFocused ? 'focused' : ''} ${isDanger ? 'near-danger' : ''}`}
+                 style={{ left: k.x+'px', top: k.y+'px', transform: `translate(-50%,-50%) rotate(${k.rotation}deg)` }}>
+              <div className="kana-inner">
+                {tweaks.trails && <span className={`kana-trail kana-char ${k.isDigraph ? 'digraph' : ''}`}>{k.kana}</span>}
+                {tweaks.trails && <span className={`kana-trail t2 kana-char ${k.isDigraph ? 'digraph' : ''}`}>{k.kana}</span>}
+                <span className={`kana-char ${k.isDigraph ? 'digraph' : ''}`}>{k.kana}</span>
+                {tweaks.drip && <span className="kana-drip" />}
+                {isFocused && typed.length > 0 && (
+                  <div className="kana-hint">
+                    <span className="typed">{typed}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {pops.map(p => {
+        const Effect = window.POP_EFFECTS[p.effect] || window.POP_EFFECTS.ink;
+        return <Effect key={p.id} x={p.x} y={p.y} kana={p.kana} accent="var(--accent)" />;
+      })}
+
+      {floaters.map(f => (
+        <div key={f.id} className="float-score" style={{left:f.x+'px', top:f.y+'px', transform:'translateX(-50%)'}}>
+          {f.text}
+          {f.combo >= 3 && <div className="float-score combo-label" style={{position:'relative',top:0,animation:'none',fontSize:11}}>×{f.combo} COMBO</div>}
+        </div>
+      ))}
+
+      <WaveZone danger={falling.some(k => k.y > dangerY)} theme={tweaks.theme} />
+
+      {screen !== 'start' && (
+        <HUD score={score} hi={hi} level={level} lives={lives} losingLife={losingLife} combo={combo} maxCombo={maxCombo} />
+      )}
+
+      {screen === 'play' && (
+        <div className="slate-wrap">
+          <div className="slate">
+            <div className="slate-label">入力 · INPUT</div>
+            <div className="slate-text">
+              <span className="typed-ch">{typed}</span>
+              <span className="caret" />
+            </div>
+            <div className="slate-brush">
+              <div className="slate-brush-fill" style={{width: Math.min(100, typed.length*25)+'%'}}/>
+            </div>
+          </div>
+          <div className="slate-hint">Type romaji · <kbd>⌫</kbd> clear · <kbd>esc</kbd> pause + tweaks</div>
+        </div>
+      )}
+
+      {flash && <div className="flash on" />}
+
+      {/* Pause backdrop — clicking it resumes */}
+      {screen === 'pause' && (
+        <div className="pause-ov" onClick={() => { setScreen('play'); setTweaksOpen(false); }}>
+          <div className="pause-badge">
+            <div className="pause-char">休</div>
+            <div style={{fontFamily:'Noto Sans JP,monospace',fontSize:10,letterSpacing:'0.4em',textTransform:'uppercase',color:'var(--ink-2)',marginTop:8}}>
+              Click backdrop or <kbd style={{fontFamily:'inherit',border:'1px solid var(--ink-2)',padding:'1px 5px',borderRadius:2}}>esc</kbd> to resume
+            </div>
+          </div>
+        </div>
+      )}
+
+      {screen === 'start' && <StartScreen onStart={startGame} tweaks={tweaks} setTweak={setTweak} hi={hi}/>}
+      {screen === 'gameover' && <GameOverScreen score={score} hi={hi} caught={caught} maxCombo={maxCombo} onRestart={startGame}/>}
+
+      {/* Tweaks panel — shown when tweaksOpen OR on pause */}
+      {(tweaksOpen || screen === 'pause') && (
+        <TweaksPanel tweaks={tweaks} setTweak={setTweak} paused={screen==='pause'} />
+      )}
+    </div>
+  );
+}
+
+function StartScreen({ onStart, tweaks, setTweak, hi }) {
+  // Quick-set presets
+  const setPreset = (preset) => {
+    if (preset === 'hira') {
+      setTweak('hiraBasic', true); setTweak('kataBasic', false);
+    } else if (preset === 'kata') {
+      setTweak('hiraBasic', false); setTweak('kataBasic', true);
+    } else {
+      setTweak('hiraBasic', true); setTweak('kataBasic', true);
+    }
+  };
+  const active = tweaks.hiraBasic && tweaks.kataBasic ? 'both' : tweaks.kataBasic ? 'kata' : 'hira';
+  return (
+    <div className="overlay">
+      <div className="overlay-card">
+        <div className="overlay-stamp">GO!</div>
+        <h1><span className="accent">仮名</span>の雨</h1>
+        <h2 style={{color:'var(--ink-2)',fontSize:18,letterSpacing:'0.3em',marginBottom:24}}>KANA · RAIN</h2>
+        <p style={{fontFamily:'Shippori Mincho,serif',fontSize:15,lineHeight:1.6,color:'var(--ink-2)',marginBottom:20}}>
+          Type the romaji of each falling character before it touches the wave.<br/>
+          Chain correct answers to build <span style={{color:'var(--accent)',fontWeight:700}}>combo × score</span>.
+        </p>
+        <div className="tweak-label" style={{textAlign:'center',marginBottom:8}}>Script</div>
+        <div className="mode-pick" style={{marginBottom:16}}>
+          <button className={`mode-btn ${active==='hira'?'active':''}`} onClick={()=>setPreset('hira')}>ひらがな</button>
+          <button className={`mode-btn ${active==='kata'?'active':''}`} onClick={()=>setPreset('kata')}>カタカナ</button>
+          <button className={`mode-btn ${active==='both'?'active':''}`} onClick={()=>setPreset('both')}>両方</button>
+        </div>
+        <div className="tweak-label" style={{textAlign:'center',marginBottom:8}}>Extra sets</div>
+        <div className="mode-pick" style={{marginBottom:24,flexWrap:'wrap',gap:6}}>
+          <button className={`mode-btn ${tweaks.hiraDakuten?'active':''}`} onClick={()=>setTweak('hiraDakuten',!tweaks.hiraDakuten)}>が゛ Dakuten</button>
+          <button className={`mode-btn ${tweaks.hiraDigraphs?'active':''}`} onClick={()=>setTweak('hiraDigraphs',!tweaks.hiraDigraphs)}>きゃ Digraphs</button>
+          <button className={`mode-btn ${tweaks.kataDakuten?'active':''}`} onClick={()=>setTweak('kataDakuten',!tweaks.kataDakuten)}>ガ゛ Kata+゛</button>
+          <button className={`mode-btn ${tweaks.kataDigraphs?'active':''}`} onClick={()=>setTweak('kataDigraphs',!tweaks.kataDigraphs)}>キャ Kata+合</button>
+        </div>
+        <button className="btn" onClick={onStart}>
+          はじめる · BEGIN <span className="kbd">↵</span>
+        </button>
+        {hi > 0 && (
+          <div style={{marginTop:20,fontFamily:'Noto Sans JP,monospace',fontSize:11,letterSpacing:'0.3em',color:'var(--ink-2)'}}>
+            BEST · {hi.toLocaleString()}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function GameOverScreen({ score, hi, caught, maxCombo, onRestart }) {
+  const isNew = score >= hi && score > 0;
+  return (
+    <div className="overlay">
+      <div className="overlay-card">
+        <div className="overlay-stamp">GO!</div>
+        <h1>{isNew ? <><span className="accent">新記録!</span></> : <>終<span className="accent">了</span></>}</h1>
+        <div className="overlay-sub">{isNew ? 'New High Score' : 'Game Over'}</div>
+        <div className="overlay-stats">
+          <div className="overlay-stat">
+            <div className="overlay-stat-v">{score.toLocaleString()}</div>
+            <div className="overlay-stat-l">Score</div>
+          </div>
+          <div className="overlay-stat">
+            <div className="overlay-stat-v">{caught}</div>
+            <div className="overlay-stat-l">Caught</div>
+          </div>
+          <div className="overlay-stat">
+            <div className="overlay-stat-v">×{maxCombo}</div>
+            <div className="overlay-stat-l">Max Combo</div>
+          </div>
+        </div>
+        <button className="btn" onClick={onRestart}>
+          もう一度 · AGAIN <span className="kbd">↵</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function TweaksPanel({ tweaks, setTweak, paused }) {
+  const themes = [
+    {id:'washi', label:'和紙', sub:'Washi'},
+    {id:'night', label:'夜', sub:'Night'},
+    {id:'dawn', label:'暁', sub:'Dawn'},
+  ];
+  const effects = [
+    {id:'ink',     label:'墨', sub:'Ink'},
+    {id:'petal',   label:'桜', sub:'Petal'},
+    {id:'stroke',  label:'光', sub:'Light'},
+    {id:'origami', label:'折', sub:'Fold'},
+    {id:'washi',   label:'紙', sub:'Tear'},
+  ];
+  return (
+    <div className={`tweaks ${paused ? 'tweaks-paused' : ''}`}
+         onClick={e => e.stopPropagation()}>
+      {/* Header */}
+      <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:4}}>
+        {paused && <span style={{background:'var(--accent)',color:'var(--paper)',fontFamily:'Shippori Mincho,serif',fontSize:11,padding:'2px 8px',letterSpacing:'0.15em'}}>休 PAUSED</span>}
+        <h3>Tweaks</h3>
+      </div>
+      <div className="tweaks-sub">調整 · Customize</div>
+
+      {/* Pop preview + effect picker side-by-side */}
+      <div className="tweak-group">
+        <div className="tweak-label">Pop Animation</div>
+        <div style={{display:'flex',gap:10,alignItems:'flex-start'}}>
+          <PopPreview effect={tweaks.popEffect} />
+          <div className="tweak-opts" style={{flexDirection:'column', flex:1}}>
+            {effects.map(e => (
+              <button key={e.id} className={`tweak-opt ${tweaks.popEffect===e.id?'active':''}`}
+                      style={{display:'flex',justifyContent:'space-between',width:'100%'}}
+                      onClick={()=>setTweak('popEffect', e.id)}>
+                <span>{e.label}</span>
+                <small style={{opacity:0.6,fontSize:10,letterSpacing:'0.1em'}}>{e.sub}</small>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="tweak-group">
+        <div className="tweak-label">Theme</div>
+        <div className="tweak-opts">
+          {themes.map(t => (
+            <button key={t.id} className={`tweak-opt ${tweaks.theme===t.id?'active':''}`} onClick={()=>setTweak('theme', t.id)}>
+              {t.label} <small style={{opacity:0.6,fontSize:10,letterSpacing:'0.1em'}}>{t.sub}</small>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="tweak-group">
+        <div className="tweak-label">Kana Sets</div>
+        {[
+          ['hiraBasic',    'ひ Basic Hiragana'],
+          ['hiraDakuten',  'が゛ Dakuten/Handakuten'],
+          ['hiraDigraphs', 'きゃ Yōon Digraphs'],
+          ['kataBasic',    'ア Basic Katakana'],
+          ['kataDakuten',  'ガ゛ Kata Dakuten'],
+          ['kataDigraphs', 'キャ Kata Digraphs'],
+        ].map(([key, label]) => (
+          <div key={key} className="tweak-toggle" onClick={()=>setTweak(key, !tweaks[key])}>
+            <span>{label}</span>
+            <div className={`toggle-switch ${tweaks[key]?'on':''}`}/>
+          </div>
+        ))}
+      </div>
+
+      <div className="tweak-group">
+        <div className="tweak-label">Atmosphere</div>
+        <div className="tweak-toggle" onClick={()=>setTweak('trails', !tweaks.trails)}>
+          <span>Ink trails</span>
+          <div className={`toggle-switch ${tweaks.trails?'on':''}`}/>
+        </div>
+        <div className="tweak-toggle" onClick={()=>setTweak('drip', !tweaks.drip)}>
+          <span>Ink drip</span>
+          <div className={`toggle-switch ${tweaks.drip?'on':''}`}/>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+window.Game = Game;
+
+</script>
+<script type="text/babel">
+  const root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(<Game />);
+</script>
+</body>
+</html>

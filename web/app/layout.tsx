@@ -67,6 +67,16 @@ export default function RootLayout({
                   {link.label}
                 </Link>
               ))}
+              <Link
+                href="/ja/"
+                style={{
+                  fontSize: "0.9rem",
+                  fontWeight: 600,
+                  color: "var(--k4-accent, #c8361f)",
+                }}
+              >
+                日本語
+              </Link>
               <a
                 href="https://github.com/wardc-developer/k4-engine"
                 target="_blank"
