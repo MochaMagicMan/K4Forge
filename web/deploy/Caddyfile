@@ -2,6 +2,10 @@ www.k4forge.org {
     redir https://k4forge.org{uri} permanent
 }
 
+analytics.k4forge.org {
+    reverse_proxy localhost:3000
+}
+
 k4forge.org {
     root * /var/www/k4forge
     file_server

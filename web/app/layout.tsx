@@ -29,6 +29,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <script
+          defer
+          src="https://analytics.k4forge.org/script.js"
+          data-website-id="REPLACE_WITH_WEBSITE_ID"
+        />
+      </head>
       <body>
         <nav
           style={{
