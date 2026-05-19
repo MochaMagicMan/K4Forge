@@ -1780,17 +1780,14 @@ function Game() {
 }
 
 function StartScreen({ onStart, tweaks, setTweak, hi }) {
-  // Quick-set presets
-  const setPreset = (preset) => {
-    if (preset === 'hira') {
-      setTweak('hiraBasic', true); setTweak('kataBasic', false);
-    } else if (preset === 'kata') {
-      setTweak('hiraBasic', false); setTweak('kataBasic', true);
-    } else {
-      setTweak('hiraBasic', true); setTweak('kataBasic', true);
-    }
-  };
-  const active = tweaks.hiraBasic && tweaks.kataBasic ? 'both' : tweaks.kataBasic ? 'kata' : 'hira';
+  const sets = [
+    ['hiraBasic',    'あ', 'Hiragana'],
+    ['hiraDakuten',  'が', 'Dakuten'],
+    ['hiraDigraphs', 'きゃ', 'Digraphs'],
+    ['kataBasic',    'ア', 'Katakana'],
+    ['kataDakuten',  'ガ', 'Kata Dakuten'],
+    ['kataDigraphs', 'キャ', 'Kata Digraphs'],
+  ];
   return (
     <div className="overlay">
       <div className="overlay-card">
@@ -1801,18 +1798,15 @@ function StartScreen({ onStart, tweaks, setTweak, hi }) {
           Type the romaji of each falling character before it touches the wave.<br/>
           Chain correct answers to build <span style={{color:'var(--accent)',fontWeight:700}}>combo × score</span>.
         </p>
-        <div className="tweak-label" style={{textAlign:'center',marginBottom:8}}>Script</div>
-        <div className="mode-pick" style={{marginBottom:16}}>
-          <button className={`mode-btn ${active==='hira'?'active':''}`} onClick={()=>setPreset('hira')}>ひらがな</button>
-          <button className={`mode-btn ${active==='kata'?'active':''}`} onClick={()=>setPreset('kata')}>カタカナ</button>
-          <button className={`mode-btn ${active==='both'?'active':''}`} onClick={()=>setPreset('both')}>両方</button>
-        </div>
-        <div className="tweak-label" style={{textAlign:'center',marginBottom:8}}>Extra sets</div>
-        <div className="mode-pick" style={{marginBottom:24,flexWrap:'wrap',gap:6}}>
-          <button className={`mode-btn ${tweaks.hiraDakuten?'active':''}`} onClick={()=>setTweak('hiraDakuten',!tweaks.hiraDakuten)}>が゛ Dakuten</button>
-          <button className={`mode-btn ${tweaks.hiraDigraphs?'active':''}`} onClick={()=>setTweak('hiraDigraphs',!tweaks.hiraDigraphs)}>きゃ Digraphs</button>
-          <button className={`mode-btn ${tweaks.kataDakuten?'active':''}`} onClick={()=>setTweak('kataDakuten',!tweaks.kataDakuten)}>ガ゛ Kata+゛</button>
-          <button className={`mode-btn ${tweaks.kataDigraphs?'active':''}`} onClick={()=>setTweak('kataDigraphs',!tweaks.kataDigraphs)}>キャ Kata+合</button>
+        <div className="tweak-label" style={{textAlign:'center',marginBottom:8}}>Kana Sets</div>
+        <div className="mode-pick" style={{marginBottom:24,flexWrap:'wrap',gap:6,justifyContent:'center'}}>
+          {sets.map(([key, kana, label]) => (
+            <button key={key} className={`mode-btn ${tweaks[key]?'active':''}`}
+                    onClick={()=>setTweak(key,!tweaks[key])}
+                    style={{minWidth:80}}>
+              {kana} <small style={{opacity:0.7,fontSize:11}}>{label}</small>
+            </button>
+          ))}
         </div>
         <button className="btn" onClick={onStart}>
           はじめる · BEGIN <span className="kbd">↵</span>
